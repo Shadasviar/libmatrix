@@ -83,6 +83,23 @@ int init_matrix_as_unit(OUT matrix *out_matrix){
 }
 
 
+int init_matrix_by_function(OUT matrix *in_matrix, init_user foo){
+	if(matrix_exists(in_matrix)){
+		double val = 0;
+    for(int i = 0; i < in_matrix->n_rows; i++){
+      for(int j = 0; j < in_matrix->n_columns; j++){
+        val = foo(i, j);
+				in_matrix->array[i][j] = val;
+      }
+    }
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+
 int transponent(IN matrix *in_matrix, OUT matrix *out_matrix){
   int status = true;
   matrix result = make_matrix(in_matrix->n_columns, in_matrix->n_rows);

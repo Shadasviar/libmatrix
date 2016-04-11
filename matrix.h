@@ -23,6 +23,8 @@ typedef struct{
   double **array;
 }matrix;
 
+typedef double(*init_user)(int, int);
+
 matrix make_matrix(const int n_rows, const int n_columns); // Do not use it on existing matrixes!!!
 
 double determinant(IN matrix*);
@@ -36,6 +38,7 @@ int show_matrix(IN matrix*);
 int init_matrix(OUT matrix*);
 int init_matrix_by_random(OUT matrix*);
 int init_matrix_as_unit(OUT matrix*);
+int init_matrix_by_function(OUT matrix*, init_user);
 
 int delete_matrix(matrix*);
 

@@ -1,5 +1,12 @@
 #include <stdio.h>
 #include "matrix.h"
+#include <stdlib.h>
+#include <time.h>
+
+
+double foo(int i, int j){
+	return i + 5*j;
+}
 
 
 int main(){
@@ -9,7 +16,8 @@ int main(){
   puts("Enter number of lines and columns of matrix of equations");
   scanf("%u%u", &n_rows, &n_columns);
   matrix equations = make_matrix(n_rows, n_columns);
-  init_matrix(&equations);
+	srand((int)time(NULL));
+  init_matrix_by_random(&equations);
 
   puts("Enter vector of results");
   matrix results = make_matrix(n_rows, 1);
