@@ -5,6 +5,14 @@
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <time.h>
+
+/* WORD means double's size */
+#define FIRST_HALF_OF_WORD 0xFFFFFFFF00000000
+#define SECOND_HALF_OF_WORD 0x00000000FFFFFFFF
+#define FULL_WORD 0xFFFFFFFFFFFFFFFF
+#define LENGHT_OF_WORD 64
+
 #define UNUSED
 #define UNUSED_PARAM 0
 #define GENERAL_ERR "WARNING: Check your input data. Something gone wrong"
@@ -30,14 +38,15 @@ inline void copy_element(const int, const int, IN matrix*, OUT matrix*);
 inline void transpon(const int, const int, IN matrix*, OUT matrix*);
 
 
-int matrix_exists(matrix *p_matrix);
+int matrix_exists(const matrix *p_matrix);
 int indexes_are_right(const int index_1, const int index_2, int max_val);
-int triangle_form_of_augmented_matrix(IN matrix*, OUT matrix*, OUT matrix*);
+int triangle_form_of_augmented_matrix(IN const matrix*, OUT matrix*, OUT matrix*);
 
 /* ---------------------------------------------------------------------------------------------------------------
  *Begin of realisation of the interface
  *
  * */
+
 
 matrix make_matrix(const int n_rows, const int n_columns){
   matrix result;
@@ -63,7 +72,7 @@ matrix make_matrix(const int n_rows, const int n_columns){
 }
 
 
-int show_matrix(IN matrix *in_matrix){
+int show_matrix(IN const matrix *in_matrix){
   return walk_on_matrix(in_matrix, show, UNUSED_PARAM);
 }
 
@@ -73,8 +82,10 @@ int init_matrix(OUT matrix *out_matrix){
 }
 
 
-int init_matrix_by_random(OUT matrix *out_matrix){ 
-  return walk_on_matrix(out_matrix, init_by_random, UNUSED_PARAM);
+int init_matrix_by_random(OUT matrix *out_matrix, const int32_t down, const int32_t up){ 
+	int64_t tmp = ((int64_t)up << LENGHT_OF_WORD/2) + down;
+	double param = (double)(tmp);
+  return walk_on_matrix(out_matrix, init_by_random, param);
 }
 
 
@@ -92,13 +103,13 @@ int init_matrix_by_function(OUT matrix *in_matrix, init_user foo){
     }
     return true;
   }
-  else{
-    return false;
-  }
+  else;
+
+	return false;
 }
 
 
-int transponent(IN matrix *in_matrix, OUT matrix *out_matrix){
+int transponent(IN  const matrix *in_matrix, OUT matrix *out_matrix){
   int status = true;
   matrix result = make_matrix(in_matrix->n_columns, in_matrix->n_rows);
   status = status && walk_on_two_matrixes(in_matrix, &result, transpon);
@@ -108,7 +119,7 @@ int transponent(IN matrix *in_matrix, OUT matrix *out_matrix){
 }
 
 
-int multiplex_matrixes(IN matrix *in_matrix_1, IN matrix *in_matrix_2, OUT matrix *out_matrix){
+int multiplex_matrixes(IN const matrix *in_matrix_1, IN const matrix *in_matrix_2, OUT matrix *out_matrix){
   if(in_matrix_2->n_rows == in_matrix_1->n_columns){
 
     matrix result = make_matrix(in_matrix_1->n_rows, in_matrix_2->n_columns);
@@ -130,7 +141,7 @@ int multiplex_matrixes(IN matrix *in_matrix_1, IN matrix *in_matrix_2, OUT matri
 }
 
 
-double determinant(IN matrix *in_matrix){
+double determinant(const matrix *in_matrix){
   if(matrix_exists(in_matrix) && in_matrix->n_rows == in_matrix->n_columns){
     double result = 1.0;
     matrix triangle = make_matrix(0,0);
@@ -143,13 +154,13 @@ double determinant(IN matrix *in_matrix){
     return result;
   }
   else{
-    puts("determinant: "GENERAL_ERR);
-    exit(1);
+    puts("determinant: " GENERAL_ERR);
+    return 0;
   }
 }
 
 
-int copy_matrix(IN matrix *in_matrix, OUT matrix *out_matrix){
+int copy_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
   if(in_matrix != out_matrix
      && matrix_exists(out_matrix)
      && matrix_exists(in_matrix))
@@ -160,19 +171,27 @@ int copy_matrix(IN matrix *in_matrix, OUT matrix *out_matrix){
     status = status && walk_on_two_matrixes(in_matrix, out_matrix, copy_element);
     return status;
   }
-  else return false;
+  else;
+
+	return false;
 }
 
 
 int delete_matrix(matrix *in_matrix){
-  for(int i = 0; i < in_matrix->n_rows; i++){
-    if(in_matrix->array){
-      free(in_matrix->array[i]);
-      in_matrix->array[i] = NULL;
-    }
-  }
-  in_matrix->array = NULL;
-  return true;
+	if(matrix_exists(in_matrix)){
+		for(int i = 0; i < in_matrix->n_rows; i++){
+			if(in_matrix->array){
+				free(in_matrix->array[i]);
+				in_matrix->array[i] = NULL;
+			}
+		}
+		free(in_matrix->array);
+		in_matrix->array = NULL;
+		return true;
+	}
+	else;
+
+	return false;
 }
 
 
@@ -186,9 +205,9 @@ int rows_swap(const int i_row_1, const int i_row_2, MODYFIED matrix *in_matrix){
     }
     return true;
   }
-  else{
-    return false;
-  }
+  else;
+
+	return false;
 }
 
 
@@ -201,7 +220,7 @@ int columns_swap(const int i_col_1, const int i_col_2, MODYFIED matrix *in_matri
 }
 
 
-int triangle_form(IN matrix *in_matrix, OUT matrix *out_matrix){
+int triangle_form(IN const matrix *in_matrix, OUT matrix *out_matrix){
   return triangle_form_of_augmented_matrix(in_matrix, out_matrix, NULL);
 }
 
@@ -210,13 +229,15 @@ int row_mult_on_const(const double factor, const int i_row, MODYFIED matrix *out
   if(indexes_are_right(i_row, UNUSED_PARAM, out_matrix->n_rows) && matrix_exists(out_matrix)){
     int status = true;
     matrix tmp = make_matrix(1, out_matrix->n_columns);
+    free(tmp.array[0]);
     tmp.array[0] = out_matrix->array[i_row];
     status = status && walk_on_matrix(&tmp, mult, factor);
+    free(tmp.array);
     return status;
   }
-  else{
-    return false;
-  }
+  else;
+
+	return false;
 }
 
 
@@ -243,9 +264,9 @@ int rows_sub(
     }
     return true;
   }
-  else{
-    return false;
-  }
+  else;
+
+	return false;
 }
 
 
@@ -266,7 +287,7 @@ int columns_sub(
 int copy_row_to_other_matrix(
   const int i_source,
   const int i_reciever,
-  IN matrix *in_matrix,
+  IN const matrix *in_matrix,
   OUT matrix *out_matrix )
 {
   if(matrix_exists(in_matrix) 
@@ -280,60 +301,63 @@ int copy_row_to_other_matrix(
     }
     return true;
   }
-  else{
-    return false;
-  }
+  else;
+
+	return false;
 }
 
 
 int copy_column_to_other_matrix(
   const int i_source,
   const int i_reciever,
-  IN matrix *in_matrix,
+  IN const matrix *in_matrix,
   OUT matrix *out_matrix )
 {
   int status = true;
-  status = status && transponent(in_matrix, in_matrix);
+	matrix tmp = make_matrix(0,0);
+  status = status && transponent(in_matrix, &tmp);
   status = status && transponent(out_matrix, out_matrix);
   status = status && copy_row_to_other_matrix(i_source, i_reciever, in_matrix, out_matrix);
-  status = status && transponent(in_matrix, in_matrix);
   status = status && transponent(out_matrix, out_matrix);
+	status = status && delete_matrix(&tmp);
   return status;
 }
 
 
-int inverse_matrix(IN matrix *in_matrix, OUT matrix *out_matrix){
+int inverse_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
   if(matrix_exists(in_matrix)
      && in_matrix->n_columns == in_matrix->n_rows
      && determinant(in_matrix) != 0)
   {
+		int status = true;
+		
     matrix result = make_matrix(in_matrix->n_rows, in_matrix->n_columns);
     matrix tmp = make_matrix(0,0);    
-    init_matrix_as_unit(&result);
-    copy_matrix(in_matrix, &tmp);
+    status = status && init_matrix_as_unit(&result);
+    status = status && copy_matrix(in_matrix, &tmp);
 
-    triangle_form_of_augmented_matrix(&tmp, &tmp, &result);
+    status = status && triangle_form_of_augmented_matrix(&tmp, &tmp, &result);
     
     double factor = 0;
     for(int i = tmp.n_rows-1; i > 0; i--){
       factor = tmp.array[i][i];
-      row_mult_on_const(1/factor, i, &tmp);
-      row_mult_on_const(1/factor, i, &result);
+      status = status && row_mult_on_const(1/factor, i, &tmp);
+      status = status && row_mult_on_const(1/factor, i, &result);
       for(int j = 0; j < i; j++){
         factor = tmp.array[j][i];
-        rows_sub(factor, j, i, &tmp);
-        rows_sub(factor, j, i, &result);
+        status = status && rows_sub(factor, j, i, &tmp);
+        status = status && rows_sub(factor, j, i, &result);
       }
     }
     
-    copy_matrix(&result, out_matrix);
-    delete_matrix(&result);
-    delete_matrix(&tmp);
-    return true;
+    status = status && copy_matrix(&result, out_matrix);
+    status = status && delete_matrix(&result);
+    status = status && delete_matrix(&tmp);
+    return status;
   }
-  else{
-    return false;
-  }
+  else;
+
+	return false;
 }
 
 
@@ -342,7 +366,7 @@ int inverse_matrix(IN matrix *in_matrix, OUT matrix *out_matrix){
  *--------------------------------------------------------------------------------------------------------------
  * */
 
-int matrix_exists(matrix *p_matrix){
+int matrix_exists(const matrix *p_matrix){
   return (p_matrix && p_matrix->array);
 }
 
@@ -352,19 +376,20 @@ int indexes_are_right(const int index_1,const int index_2, int max_val){
 }
 
 
-int triangle_form_of_augmented_matrix(IN matrix *in_matrix, OUT matrix *out_matrix, OUT matrix *half_an_invert_matrix){
+int triangle_form_of_augmented_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix, OUT matrix *half_an_invert_matrix){
+	int status = true;
   matrix result = make_matrix(0,0);
   matrix result_2 = make_matrix(in_matrix->n_rows,in_matrix->n_columns);
-  copy_matrix(in_matrix, &result);
-  init_matrix_as_unit(&result_2);
+  status = status && copy_matrix(in_matrix, &result);
+  status = status && init_matrix_as_unit(&result_2);
 
   for(int i = 0; i < result.n_rows; i++){
     if(result.array[0][0] != 0){
       break;
     }
     else{
-      rows_swap(i, 0, &result);
-      rows_swap(i, 0, &result_2);
+      status = status && rows_swap(i, 0, &result);
+      status = status && rows_swap(i, 0, &result_2);
     }
   }
 
@@ -373,12 +398,12 @@ int triangle_form_of_augmented_matrix(IN matrix *in_matrix, OUT matrix *out_matr
     for(int j = 1+i; j < result.n_rows; j++){
       if(result.array[i][i] != 0 && result.array[j][i] != 0){    
         tmp = result.array[j][i];
-        row_mult_on_const(result.array[i][i], j, &result);
-        row_mult_on_const(result.array[i][i], j, &result_2);
-        rows_sub(tmp, j, i, &result);
-        rows_sub(tmp, j, i, &result_2);
-        row_mult_on_const(1/result.array[i][i], j, &result);
-        row_mult_on_const(1/result.array[i][i], j, &result_2);
+        status = status && row_mult_on_const(result.array[i][i], j, &result);
+        status = status && row_mult_on_const(result.array[i][i], j, &result_2);
+        status = status && rows_sub(tmp, j, i, &result);
+        status = status && rows_sub(tmp, j, i, &result_2);
+        status = status && row_mult_on_const(1/result.array[i][i], j, &result);
+        status = status && row_mult_on_const(1/result.array[i][i], j, &result_2);
       }
       else{
         continue;
@@ -386,11 +411,11 @@ int triangle_form_of_augmented_matrix(IN matrix *in_matrix, OUT matrix *out_matr
     }
   }
 
-  copy_matrix(&result, out_matrix);
-  copy_matrix(&result_2, half_an_invert_matrix);
-  delete_matrix(&result);
-  delete_matrix(&result_2);
-  return true;
+  status = status && copy_matrix(&result, out_matrix);
+  status = status && copy_matrix(&result_2, half_an_invert_matrix);
+  status = status && delete_matrix(&result);
+  status = status && delete_matrix(&result_2);
+  return status;
 }
 
 
@@ -425,7 +450,10 @@ int walk_on_two_matrixes(IN matrix *in_matrix, OUT matrix *out_matrix, action_wi
 
 
 void init_by_random(const int i_row, const int i_column, OUT matrix *out_matrix, const double param){
-  out_matrix->array[i_row][i_column] = 0+rand()%10;
+	srand((int)time(NULL)+(rand()));
+	int32_t up = (int32_t)((((int64_t)param) & FIRST_HALF_OF_WORD) >> LENGHT_OF_WORD/2);
+	int32_t down = (int32_t)((int64_t)param & SECOND_HALF_OF_WORD);
+  out_matrix->array[i_row][i_column] = ((rand() % (up-down+1)) + down);
 }
 
 

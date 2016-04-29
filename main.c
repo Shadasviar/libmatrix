@@ -20,8 +20,12 @@ int main(){
   init_matrix_by_random(&equations);
 
   puts("Enter vector of results");
+
+	int a;
+	scanf("%d", &a);
+
   matrix results = make_matrix(n_rows, 1);
-  init_matrix(&results);
+  init_matrix_by_random(&results);
   show_matrix(&equations);
   puts("-------------------------------------");
 
@@ -57,6 +61,8 @@ int main(){
   }
   delete_matrix(&equations);
   delete_matrix(&results);
+
+	scanf("%d", &a);
 
   return 0;
 }
