@@ -11,7 +11,13 @@ int main(){
     scanf("%d%d", &a, &b);
 
     matrix matr = make_matrix(a, b);
-    init_matrix_by_random(&matr, 0, 8);
+    init_matrix(&matr);
+		printf("Determinant: %f\n", determinant(&matr));
+		printf("Rank: %d\n", rank(&matr));
+		matrix pp = make_matrix(0, 0);
+		triangle_form(&matr, &pp);
+		show_matrix(&pp);
+		
 
     puts("Enter vector of results");
     matrix results = make_matrix(a, 1);

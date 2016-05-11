@@ -5,13 +5,13 @@ CC = gcc
 CFLAGS = -g -Wall -std=c11
 OBJECTS = matrix.o main.o
 INCFLAGS = 
-LDFLAGS = -Wl,-rpath,/usr/local/lib
+LDFLAGS = -Wl,-rpath,/usr/local/lib, -lm
 LIBS = 
 
 all: matrix
 
 matrix: $(OBJECTS)
-	$(CC) -o matrix $(OBJECTS) $(LDFLAGS) $(LIBS)
+	$(CC) -o matrix $(OBJECTS) -L $(LDFLAGS) $(LIBS)
 
 .SUFFIXES:
 .SUFFIXES:	.c .cc .C .cpp .o
