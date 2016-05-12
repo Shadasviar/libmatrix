@@ -16,32 +16,28 @@
 
 #define UNUSED
 #define UNUSED_PARAM 0
+#define UNUSED_F(x) (void)(x)
 #define GENERAL_ERR "WARNING: Check your input data. Something gone wrong"
 #define UNEXISTING_MATRIX_ERR "WARNING: Unexisting matrix was called"
 #define OUT_OF_RANGE_MATRIX_ERR "WARNING: Element is outside of matrix range was called"
 
-typedef void (*action)(const int, const int, MODYFIED  matrix*, const double param);
-typedef void (*action_with_two_matrix)(const int, const int, matrix*, OUT matrix*);
+typedef void (*action)(int, int, const IN matrix*, OUT matrix*, double);
 
 
-int walk_on_matrix(MODYFIED matrix*, action, double param);
+int walk_on_matrix(const IN matrix*, OUT matrix*, action, double);
 
-inline void show(const int, const int, IN  matrix*, UNUSED const double param);
-inline void init(const int, const int, MODYFIED  matrix*, UNUSED const double param);
-inline void init_by_random(const int, const int, MODYFIED matrix*, double param);
-inline void init_as_unit(const int, const int, MODYFIED matrix*, UNUSED double param);
-inline void mult(const int, const int, MODYFIED matrix*, const double param);
-
-
-int walk_on_two_matrixes(IN matrix*, OUT matrix*, action_with_two_matrix);
-
-inline void copy_element(const int, const int, IN matrix*, OUT matrix*);
-inline void transpon(const int, const int, IN matrix*, OUT matrix*);
+inline void show(int, int, const IN matrix*, UNUSED matrix*, UNUSED double);
+inline void init(int, int, UNUSED const matrix*, OUT matrix*, UNUSED double);
+inline void init_by_random(int, int, UNUSED const matrix*, OUT matrix*, double);
+inline void init_as_unit(int, int, UNUSED const matrix*, OUT matrix*, UNUSED double);
+inline void mult(int, int, UNUSED const matrix*, OUT matrix*, double);
+inline void copy_element(int, int, const IN matrix*, OUT matrix*, UNUSED double);
+inline void transpon(int, int, const IN matrix*, OUT matrix*, UNUSED double);
 
 
 int matrix_exists(const matrix *p_matrix);
 int indexes_are_right(int index_1, int index_2, int max_val);
-int triangle_form_of_augmented_matrix(IN matrix*, OUT matrix*, OUT matrix*);
+int triangle_form_of_augmented_matrix(IN const matrix*, OUT matrix*, OUT matrix*);
 
 /* ---------------------------------------------------------------------------------------------------------------
  *Begin of realisation of the interface
@@ -74,25 +70,25 @@ matrix make_matrix(int n_rows, int n_columns){
 }
 
 
-int show_matrix(IN matrix *in_matrix){
-  return walk_on_matrix(in_matrix, show, UNUSED_PARAM);
+int show_matrix(IN const matrix *in_matrix){
+  return walk_on_matrix(in_matrix, UNUSED_PARAM, show, UNUSED_PARAM);
 }
 
 
 int init_matrix(MODYFIED matrix *out_matrix){
-  return walk_on_matrix(out_matrix, init, UNUSED_PARAM);
+  return walk_on_matrix(UNUSED_PARAM, out_matrix, init, UNUSED_PARAM);
 }
 
 
 int init_matrix_by_random(MODYFIED matrix *out_matrix, int32_t down, int32_t up){ 
 	int64_t tmp = ((int64_t)up << LENGHT_OF_WORD/2) + down;
 	double param = (double)(tmp);
-  return walk_on_matrix(out_matrix, init_by_random, param);
+  return walk_on_matrix(UNUSED_PARAM, out_matrix, init_by_random, param);
 }
 
 
 int init_matrix_as_unit(MODYFIED matrix *out_matrix){
-  return walk_on_matrix(out_matrix, init_as_unit, UNUSED_PARAM);
+  return walk_on_matrix(UNUSED_PARAM, out_matrix, init_as_unit, UNUSED_PARAM);
 }
 
 
@@ -111,17 +107,17 @@ int init_matrix_by_function(MODYFIED matrix *in_matrix, init_user foo){
 }
 
 
-int transponent(IN matrix *in_matrix, OUT matrix *out_matrix){
+int transponent(IN const matrix *in_matrix, OUT matrix *out_matrix){
   int status = true;
   matrix result = make_matrix(in_matrix->n_columns, in_matrix->n_rows);
-  status = status && walk_on_two_matrixes(in_matrix, &result, transpon);
+  status = status && walk_on_matrix(in_matrix, &result, transpon, UNUSED_PARAM);
   status = status && copy_matrix(&result, out_matrix);
   delete_matrix(&result);
   return status;
 }
 
 
-int multiplex_matrixes(IN matrix *in_matrix_1, IN matrix *in_matrix_2, OUT matrix *out_matrix){
+int multiplex_matrixes(IN const matrix *in_matrix_1, IN const matrix *in_matrix_2, OUT matrix *out_matrix){
   if(in_matrix_2->n_rows == in_matrix_1->n_columns){
 
     matrix result = make_matrix(in_matrix_1->n_rows, in_matrix_2->n_columns);
@@ -143,7 +139,7 @@ int multiplex_matrixes(IN matrix *in_matrix_1, IN matrix *in_matrix_2, OUT matri
 }
 
 
-double determinant(IN matrix *in_matrix){
+double determinant(IN const matrix *in_matrix){
   if(matrix_exists(in_matrix) && in_matrix->n_rows == in_matrix->n_columns){
     double result = 1.0;
     matrix triangle = make_matrix(0,0);
@@ -164,7 +160,7 @@ double determinant(IN matrix *in_matrix){
 }
 
 
-int rank(IN matrix *in_matrix){
+int rank(IN const matrix *in_matrix){
 	matrix tmp = make_matrix(0,0);
 	copy_matrix(in_matrix, &tmp);
 	triangle_form(&tmp, &tmp);
@@ -180,7 +176,7 @@ int rank(IN matrix *in_matrix){
 }
 
 
-int copy_matrix(IN matrix *in_matrix, OUT matrix *out_matrix){
+int copy_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
   if(in_matrix != out_matrix
      && matrix_exists(out_matrix)
      && matrix_exists(in_matrix))
@@ -188,7 +184,7 @@ int copy_matrix(IN matrix *in_matrix, OUT matrix *out_matrix){
     int status = true;
     delete_matrix(out_matrix);
     *out_matrix = make_matrix(in_matrix->n_rows, in_matrix->n_columns);
-    status = status && walk_on_two_matrixes(in_matrix, out_matrix, copy_element);
+    status = status && walk_on_matrix(in_matrix, out_matrix, copy_element, UNUSED_PARAM);
 		out_matrix->n_permutations = in_matrix->n_permutations;
     return status;
   }
@@ -242,7 +238,7 @@ int columns_swap(int i_col_1, int i_col_2, MODYFIED matrix *in_matrix){
 }
 
 
-int triangle_form(IN matrix *in_matrix, OUT matrix *out_matrix){
+int triangle_form(IN const matrix *in_matrix, OUT matrix *out_matrix){
   return triangle_form_of_augmented_matrix(in_matrix, out_matrix, NULL);
 }
 
@@ -253,7 +249,7 @@ int row_mult_on_const(double factor, int i_row, MODYFIED matrix *out_matrix){
     matrix tmp = make_matrix(1, out_matrix->n_columns);
     free(tmp.array[0]);
     tmp.array[0] = out_matrix->array[i_row];
-    status = status && walk_on_matrix(&tmp, mult, factor);
+    status = status && walk_on_matrix(UNUSED_PARAM, &tmp, mult, factor);
     free(tmp.array);
     return status;
   }
@@ -273,12 +269,10 @@ int column_mult_on_const(double factor, int i_column, MODYFIED matrix *out_matri
 
 
 int rows_sub(
-
   double factor,
   int i_subtracted_row,
   int i_subtracting_row,
   MODYFIED matrix *out_matrix)
-
 {
   if(indexes_are_right(i_subtracted_row, i_subtracting_row, out_matrix->n_rows) && matrix_exists(out_matrix)){
     for(int i = 0; i < out_matrix->n_columns; i++){
@@ -332,7 +326,7 @@ int copy_row_to_other_matrix(
 int copy_column_to_other_matrix(
   int i_source,
   int i_reciever,
-  IN matrix *in_matrix,
+  IN const matrix *in_matrix,
   OUT matrix *out_matrix )
 {
   int status = true;
@@ -346,7 +340,7 @@ int copy_column_to_other_matrix(
 }
 
 
-int inverse_matrix(IN matrix *in_matrix, OUT matrix *out_matrix){
+int inverse_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
   if(matrix_exists(in_matrix)
      && in_matrix->n_columns == in_matrix->n_rows
      && determinant(in_matrix) != 0)
@@ -398,7 +392,7 @@ int indexes_are_right(int index_1, int index_2, int max_val){
 }
 
 
-int triangle_form_of_augmented_matrix(IN matrix *in_matrix, OUT matrix *out_matrix, OUT matrix *half_an_inverted_matrix){
+int triangle_form_of_augmented_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix, OUT matrix *half_an_inverted_matrix){
 	int status = true;
   matrix result = make_matrix(0,0);
   matrix result_2 = make_matrix(in_matrix->n_rows,in_matrix->n_columns);
@@ -443,11 +437,20 @@ int triangle_form_of_augmented_matrix(IN matrix *in_matrix, OUT matrix *out_matr
 }
 
 
-int walk_on_matrix(MODYFIED matrix *in_matrix, action foo,const double param){
-  if(matrix_exists(in_matrix)){
-    for(int i = 0; i < in_matrix->n_rows; i++){
-      for(int j = 0; j < in_matrix->n_columns; j++){
-        foo(i, j, in_matrix, param);
+int walk_on_matrix(
+	const IN matrix *in_matrix,
+	OUT matrix *out_matrix,
+	action foo,
+	double param)
+{
+	int n_rows = 0;
+	int n_columns = 0;
+  if(matrix_exists(in_matrix) || matrix_exists(out_matrix)){
+		n_rows = matrix_exists(in_matrix) ? in_matrix->n_rows : out_matrix->n_rows;
+		n_columns = matrix_exists(in_matrix) ? in_matrix->n_columns : out_matrix->n_columns;
+    for(int i = 0; i < n_rows; i++){
+      for(int j = 0; j < n_columns; j++){
+        foo(i, j, in_matrix, out_matrix, param);
       }
     }
     return true;
@@ -458,22 +461,14 @@ int walk_on_matrix(MODYFIED matrix *in_matrix, action foo,const double param){
 }
 
 
-int walk_on_two_matrixes(IN matrix *in_matrix, OUT matrix *out_matrix, action_with_two_matrix foo){
-  if(matrix_exists(in_matrix) && matrix_exists(out_matrix)){
-    for(int i = 0; i < in_matrix->n_rows; i++){
-      for(int j = 0; j < in_matrix->n_columns; j++){
-        foo(i, j, in_matrix, out_matrix);
-      }
-    }
-    return true;
-  }
-  else{
-    return false;
-  }
-}
-
-
-void init_by_random(const int i_row, const int i_column, MODYFIED matrix *out_matrix, const double param){
+void init_by_random(
+	int i_row,
+	int i_column,
+	UNUSED const matrix *in_matrix,
+	OUT matrix *out_matrix,
+	double param)
+{
+	UNUSED_F(in_matrix);
 	srand((int)time(NULL)+(rand()));
 	int32_t up = (int32_t)((((int64_t)param) & FIRST_HALF_OF_WORD) >> LENGHT_OF_WORD/2);
 	int32_t down = (int32_t)((int64_t)param & SECOND_HALF_OF_WORD);
@@ -481,34 +476,80 @@ void init_by_random(const int i_row, const int i_column, MODYFIED matrix *out_ma
 }
 
 
-void show(const int i_row, const int i_column, IN matrix *in_matrix, const double param){
+void show(
+	int i_row,
+	int i_column,
+	IN const matrix *in_matrix,
+	UNUSED matrix *out_matrix,
+	UNUSED double param)
+{
+	UNUSED_F(out_matrix);
+	UNUSED_F(param);
   printf(" %.2f ", in_matrix->array[i_row][i_column]);
   if(i_column == in_matrix->n_columns-1) puts("");
 }
 
 
-void init(const int i_row, const int i_column, MODYFIED matrix *out_matrix, const double param){
+void init(
+	int i_row,
+	int i_column,
+	UNUSED const matrix *in_matrix,
+	OUT matrix *out_matrix,
+	UNUSED double param)
+{
+	UNUSED_F(in_matrix);
+	UNUSED_F(param);
   printf("Enter %d %d elment: ",i_row, i_column);
   scanf("%lf", &out_matrix->array[i_row][i_column]);
 }
 
 
-void init_as_unit(const int i_row, const int i_column, MODYFIED matrix *out_matrix, const double param){
+void init_as_unit(
+	int i_row,
+	int i_column,
+	UNUSED const matrix *in_matrix,
+	OUT matrix *out_matrix,
+	UNUSED double param)
+{
+	UNUSED_F(in_matrix);
+	UNUSED_F(param);
   if(i_row == i_column) out_matrix->array[i_row][i_column] = 1;
 }
 
 
-void mult(const int i_row, const int i_column, OUT matrix *out_matrix, const double param){
+void mult(
+	int i_row,
+	int i_column,
+	UNUSED const matrix *in_matrix,
+	OUT matrix *out_matrix,
+	UNUSED double param)
+{
+	UNUSED_F(in_matrix);
+	UNUSED_F(param);
   out_matrix->array[i_row][i_column] *= param;
 }
 
 
-void copy_element(const int i_row, const int i_column, IN matrix *in_matrix, OUT matrix *out_matrix){
+void copy_element(
+	int i_row,
+	int i_column,
+	IN const matrix *in_matrix,
+	OUT matrix *out_matrix,
+	UNUSED double param)
+{
+	UNUSED_F(param);
   out_matrix->array[i_row][i_column] = in_matrix->array[i_row][i_column];
 }
 
 
-void transpon(const int i_row, const int i_column, IN matrix *in_matrix, OUT matrix *out_matrix){
+void transpon(
+	int i_row,
+	int i_column,
+	IN const matrix *in_matrix,
+	OUT matrix *out_matrix,
+	UNUSED double param)
+{
+	UNUSED_F(param);
   out_matrix->array[i_column][i_row] = in_matrix->array[i_row][i_column];
 }
 

@@ -31,15 +31,15 @@ typedef double(*init_user)(int, int);
 
 matrix make_matrix(int n_rows, int n_columns); // Do not use it on existing matrixes!!!
 
-double determinant(IN matrix*);
-int rank(IN matrix*);
+double determinant(IN const matrix*);
+int rank(IN const matrix*);
 
-int copy_matrix(IN matrix*, OUT matrix*);
-int transponent(IN matrix*, OUT matrix*);
-int multiplex_matrixes(IN matrix*, IN matrix*, OUT matrix*);
-int triangle_form(IN matrix*, OUT matrix*);
+int copy_matrix(IN const matrix*, OUT matrix*);
+int transponent(IN const matrix*, OUT matrix*);
+int multiplex_matrixes(IN const matrix*,IN const matrix*, OUT matrix*);
+int triangle_form(IN const matrix*, OUT matrix*);
 
-int show_matrix(IN matrix*);
+int show_matrix(IN const matrix*);
 int init_matrix(MODYFIED matrix*);
 int init_matrix_by_random(MODYFIED matrix*, int32_t down, int32_t up);
 int init_matrix_as_unit(MODYFIED matrix*);
@@ -57,7 +57,7 @@ int rows_sub(double factor, int i_subtracted_row, int i_subtracting_row, MODYFIE
 int columns_sub(double factor, int i_subtracted_column, int i_subtracting_column, MODYFIED matrix*);
 
 int copy_row_to_other_matrix(int i_source, int i_reciever, IN const matrix *in_matrix, OUT matrix *out_matrix);
-int copy_column_to_other_matrix(int i_source, int i_reciever, IN matrix *in_matrix, OUT matrix *out_matrix);
+int copy_column_to_other_matrix(int i_source, int i_reciever, IN const matrix *in_matrix, OUT matrix *out_matrix);
 
-int inverse_matrix(IN matrix *in_matrix, OUT matrix *out_matrix);
+int inverse_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix);
 
