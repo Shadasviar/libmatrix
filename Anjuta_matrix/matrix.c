@@ -31,7 +31,7 @@ typedef struct{
 typedef void (*action)(int, int, iomatr);
 
 
-iomatr init_iomatr(IN const matrix*, OUT matrix*, double );
+iomatr transmit_params(IN const matrix*, OUT matrix*, double );
 
 int walk_on_matrix(iomatr, action);
 
@@ -79,24 +79,24 @@ matrix make_matrix(int n_rows, int n_columns){
 
 
 int show_matrix(IN const matrix *in_matrix){
-  return walk_on_matrix(init_iomatr(in_matrix,UNUSED, UNUSED), show);
+  return walk_on_matrix(transmit_params(in_matrix,UNUSED, UNUSED), show);
 }
 
 
 int init_matrix(MODYFIED matrix *out_matrix){
-  return walk_on_matrix(init_iomatr(UNUSED, out_matrix, UNUSED), init);
+  return walk_on_matrix(transmit_params(UNUSED, out_matrix, UNUSED), init);
 }
 
 
 int init_matrix_by_random(MODYFIED matrix *out_matrix, int32_t down, int32_t up){ 
 	int64_t tmp = ((int64_t)up << LENGHT_OF_WORD/2) + down;
 	double param = (double)(tmp);
-  return walk_on_matrix(init_iomatr(UNUSED, out_matrix, param), init_by_random);
+  return walk_on_matrix(transmit_params(UNUSED, out_matrix, param), init_by_random);
 }
 
 
 int init_matrix_as_unit(MODYFIED matrix *out_matrix){
-  return walk_on_matrix(init_iomatr(UNUSED, out_matrix, UNUSED), init_as_unit);
+  return walk_on_matrix(transmit_params(UNUSED, out_matrix, UNUSED), init_as_unit);
 }
 
 
@@ -118,7 +118,7 @@ int init_matrix_by_function(MODYFIED matrix *in_matrix, init_user foo){
 int transponent(IN const matrix *in_matrix, OUT matrix *out_matrix){
   int status = true;
   matrix result = make_matrix(in_matrix->n_columns, in_matrix->n_rows);
-  status = status && walk_on_matrix(init_iomatr(in_matrix, &result, UNUSED), transpon);
+  status = status && walk_on_matrix(transmit_params(in_matrix, &result, UNUSED), transpon);
   status = status && copy_matrix(&result, out_matrix);
   delete_matrix(&result);
   return status;
@@ -192,7 +192,7 @@ int copy_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
     int status = true;
     delete_matrix(out_matrix);
     *out_matrix = make_matrix(in_matrix->n_rows, in_matrix->n_columns);
-    status = status && walk_on_matrix(init_iomatr(in_matrix, out_matrix, UNUSED), copy_element);
+    status = status && walk_on_matrix(transmit_params(in_matrix, out_matrix, UNUSED), copy_element);
 		out_matrix->n_permutations = in_matrix->n_permutations;
     return status;
   }
@@ -257,7 +257,7 @@ int row_mult_on_const(double factor, int i_row, MODYFIED matrix *out_matrix){
     matrix tmp = make_matrix(1, out_matrix->n_columns);
     free(tmp.array[0]);
     tmp.array[0] = out_matrix->array[i_row];		
-    status = status && walk_on_matrix(init_iomatr(UNUSED, &tmp, factor), mult);
+    status = status && walk_on_matrix(transmit_params(UNUSED, &tmp, factor), mult);
     free(tmp.array);
     return status;
   }
@@ -341,7 +341,7 @@ int copy_column_to_other_matrix(
 	matrix tmp = make_matrix(0,0);
   status = status && transponent(in_matrix, &tmp);
   status = status && transponent(out_matrix, out_matrix);
-  status = status && copy_row_to_other_matrix(i_source, i_reciever, in_matrix, out_matrix);
+  status = status && copy_row_to_other_matrix(i_source, i_reciever, &tmp, out_matrix);
   status = status && transponent(out_matrix, out_matrix);
 	status = status && delete_matrix(&tmp);
   return status;
@@ -512,7 +512,7 @@ void transpon(int i_row, int i_column, iomatr matr)
 }
 
 
-iomatr init_iomatr(const matrix *in_matrix, matrix *out_matrix, double param){
+iomatr transmit_params(const matrix *in_matrix, matrix *out_matrix, double param){
 	iomatr result = {0};
 	result.in_matrix = in_matrix;
 	result.out_matrix = out_matrix;

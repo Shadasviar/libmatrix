@@ -12,6 +12,14 @@ int main(){
 
     matrix matr = make_matrix(a, b);
     init_matrix(&matr);
+
+		puts("DEBUG:");
+		matrix tmp = make_matrix(a,b);
+		show_matrix(&tmp);
+		copy_column_to_other_matrix(1,1,&matr, &tmp);
+		show_matrix(&tmp);
+		puts("DEBUG:");
+	
 		printf("Determinant: %f\n", determinant(&matr));
 		printf("Rank: %d\n", rank(&matr));
 		matrix pp = make_matrix(0, 0);
