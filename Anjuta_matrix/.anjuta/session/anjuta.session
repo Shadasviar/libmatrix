@@ -1,9 +1,9 @@
 [Anjuta]
 Maximized=1
-Geometry=1920x1000+0+41
+Geometry=1920x1002+0+41
 
 [File Loader]
-Files=../../main.c#14%%%../../matrix.h#62%%%../../matrix.c#451%%%../../Makefile#14
+Files=../../main.c#14%%%../../matrix.h#62%%%../../matrix.c#51%%%../../Makefile#14
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n

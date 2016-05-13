@@ -18,8 +18,7 @@
 #define UNUSED_PARAM 0
 #define UNUSED_F(x) (void)(x)
 #define GENERAL_ERR "WARNING: Check your input data. Something gone wrong"
-#define UNEXISTING_MATRIX_ERR "WARNING: Unexisting matrix was called"
-#define OUT_OF_RANGE_MATRIX_ERR "WARNING: Element is outside of matrix range was called"
+#define NOT_ENOUGH_MEMORY_EXIT {puts("make_matrix: ERROR: NOT ENOUGH MEMORY"); exit(1);}
 
 typedef void (*action)(int, int, const IN matrix*, OUT matrix*, double);
 
@@ -49,15 +48,14 @@ matrix make_matrix(int n_rows, int n_columns){
   matrix result;
 
   double **array = (double**) calloc(n_rows, sizeof(*array));
-  assert(array != NULL);
+  if(array == NULL) NOT_ENOUGH_MEMORY_EXIT;
   for(int i = 0; i < n_rows; i++){
     array[i] = (double*) calloc(n_columns, sizeof(*array[i]));
     if(array[i] != NULL){
       memset(array[i], 0.0, n_columns * sizeof(*array[i]));
     }
     else{
-      puts("make_matrix: ERROR: NOT ENOUGH MEMORY");
-      exit(1);
+			NOT_ENOUGH_MEMORY_EXIT;
     }
   }
 
