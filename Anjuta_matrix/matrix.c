@@ -190,18 +190,21 @@ double determinant(IN const matrix *in_matrix){
 
 
 int rank(IN const matrix *in_matrix){
-  matrix tmp = make_matrix(0,0);
-  copy_matrix(in_matrix, &tmp);
-  triangle_form(&tmp, &tmp);
-  int result = tmp.n_rows;
-  for(int i = 0; i < tmp.n_rows; ++i){
-    for(int j = tmp.n_columns-1; j >= 0; --j){
-      if(tmp.array[i][j] != 0) break;
-      if(j == 0) --result;
+	if(matrix_exists(in_matrix)){
+    matrix tmp = make_matrix(0,0);
+    copy_matrix(in_matrix, &tmp);
+    triangle_form(&tmp, &tmp);
+    int result = tmp.n_rows;
+    for(int i = 0; i < tmp.n_rows; ++i){
+      for(int j = tmp.n_columns-1; j >= 0; --j){
+        if(tmp.array[i][j] != 0) break;
+        if(j == 0) --result;
+      }
     }
+    delete_matrix(&tmp);
+    return result;
   }
-  delete_matrix(&tmp);
-  return result;
+  return 0;
 }
 
 
@@ -421,7 +424,11 @@ int indexes_are_right(int index_1, int index_2, int max_val){
 }
 
 
-int triangle_form_of_augmented_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix, OUT matrix *half_an_inverted_matrix){
+int triangle_form_of_augmented_matrix(
+  IN const matrix *in_matrix,
+  OUT matrix *out_matrix,
+  OUT matrix *half_an_inverted_matrix)
+{
   int status = true;
   matrix result = make_matrix(0,0);
   matrix result_2 = make_matrix(in_matrix->n_rows,in_matrix->n_columns);
@@ -466,8 +473,7 @@ int triangle_form_of_augmented_matrix(IN const matrix *in_matrix, OUT matrix *ou
 }
 
 
-int walk_on_matrix(iomatr matr, action foo)
-{
+int walk_on_matrix(iomatr matr, action foo){
   if(matrix_exists(matr.in_matrix) || matrix_exists(matr.out_matrix)){
     int n_rows = matrix_exists(matr.in_matrix) ? matr.in_matrix->n_rows : matr.out_matrix->n_rows;
     int n_columns = matrix_exists(matr.in_matrix) ? matr.in_matrix->n_columns : matr.out_matrix->n_columns;
@@ -484,8 +490,7 @@ int walk_on_matrix(iomatr matr, action foo)
 }
 
 
-void init_by_random(int i_row, int i_column, iomatr matr)
-{
+void init_by_random(int i_row, int i_column, iomatr matr){
   srand((int)time(NULL)+(rand()));
   int32_t up = (int32_t)((((int64_t)matr.param) & FIRST_HALF_OF_WORD) >> LENGHT_OF_WORD/2);
   int32_t down = (int32_t)((int64_t)matr.param & SECOND_HALF_OF_WORD);
@@ -493,40 +498,34 @@ void init_by_random(int i_row, int i_column, iomatr matr)
 }
 
 
-void show(int i_row, int i_column, iomatr matr)
-{
+void show(int i_row, int i_column, iomatr matr){
   printf(" %.2f ", matr.in_matrix->array[i_row][i_column]);
   if(i_column == matr.in_matrix->n_columns-1) puts("");
 }
 
 
-void init(int i_row, int i_column, iomatr matr)
-{
+void init(int i_row, int i_column, iomatr matr){
   printf("Enter %d %d elment: ",i_row, i_column);
   scanf("%lf", &matr.out_matrix->array[i_row][i_column]);
 }
 
 
-void init_as_unit(int i_row, int i_column, iomatr matr)
-{
+void init_as_unit(int i_row, int i_column, iomatr matr){
   if(i_row == i_column) matr.out_matrix->array[i_row][i_column] = 1;
 }
 
 
-void mult(int i_row, int i_column, iomatr matr)
-{
+void mult(int i_row, int i_column, iomatr matr){
   matr.out_matrix->array[i_row][i_column] *= matr.param;
 }
 
 
-void copy_element(int i_row, int i_column, iomatr matr)
-{
+void copy_element(int i_row, int i_column, iomatr matr){
   matr.out_matrix->array[i_row][i_column] = matr.in_matrix->array[i_row][i_column];
 }
 
 
-void transpon(int i_row, int i_column, iomatr matr)
-{
+void transpon(int i_row, int i_column, iomatr matr){
   matr.out_matrix->array[i_column][i_row] = matr.in_matrix->array[i_row][i_column];
 }
 
