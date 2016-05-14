@@ -8,4 +8,4 @@ libmatrix.a: matrix.o
 	ar cr libmatrix.a matrix.o
 
 matrix: main.o libmatrix.a
-	gcc -o matrix main.o -L. -l:libmatrix.a -std=c11 -Wextra
+	gcc -o matrix main.o -L. -l:libmatrix.a -lm -std=c11 -Wextra

@@ -109,7 +109,7 @@ int init_matrix_by_function(MODIFIED matrix *in_matrix, init_user foo){
     }
     return true;
   }
-  else;
+  else{};
 
 	return false;
 }
@@ -196,7 +196,7 @@ int copy_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
 		out_matrix->n_permutations = in_matrix->n_permutations;
     return status;
   }
-  else;
+  else{};
 
 	return false;
 }
@@ -214,7 +214,7 @@ int delete_matrix(matrix *in_matrix){
 		in_matrix->array = NULL;
 		return true;
 	}
-	else;
+	else{};
 
 	return false;
 }
@@ -231,7 +231,7 @@ int rows_swap(int i_row_1, int i_row_2, MODIFIED matrix *in_matrix){
 		++(in_matrix->n_permutations);
     return true;
   }
-  else;
+  else{};
 
 	return false;
 }
@@ -261,7 +261,7 @@ int row_mult_on_const(double factor, int i_row, MODIFIED matrix *out_matrix){
     free(tmp.array);
     return status;
   }
-  else;
+  else{};
 
 	return false;
 }
@@ -288,7 +288,7 @@ int rows_sub(
     }
     return true;
   }
-  else;
+  else{};
 
 	return false;
 }
@@ -325,7 +325,7 @@ int copy_row_to_other_matrix(
     }
     return true;
   }
-  else;
+  else{};
 
 	return false;
 }
@@ -379,7 +379,7 @@ int inverse_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
     status = status && delete_matrix(&tmp);
     return status;
   }
-  else;
+  else{};
 
 	return false;
 }
