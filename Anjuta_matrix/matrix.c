@@ -42,9 +42,9 @@
  * compiler warnings about unused vars.
  */ 
 typedef struct{
-	IN const matrix *in_matrix;
-	OUT matrix *out_matrix;
-	double param;
+  IN const matrix *in_matrix;
+  OUT matrix *out_matrix;
+  double param;
 }iomatr;
 
 typedef void (*action)(int, int, iomatr);
@@ -84,14 +84,14 @@ matrix make_matrix(int n_rows, int n_columns){
       memset(array[i], 0.0, n_columns * sizeof(*array[i]));
     }
     else{
-			NOT_ENOUGH_MEMORY_EXIT;
+      NOT_ENOUGH_MEMORY_EXIT;
     }
   }
 
   result.n_columns = n_columns;
   result.n_rows = n_rows;
   result.array = array;
-	result.n_permutations = 0;
+  result.n_permutations = 0;
 
   return result;
 }
@@ -108,8 +108,8 @@ int init_matrix(MODIFIED matrix *out_matrix){
 
 
 int init_matrix_by_random(MODIFIED matrix *out_matrix, int32_t down, int32_t up){ 
-	int64_t tmp = ((int64_t)up << LENGHT_OF_WORD/2) + down;
-	double param = (double)(tmp);
+  int64_t tmp = ((int64_t)up << LENGHT_OF_WORD/2) + down;
+  double param = (double)(tmp);
   return walk_on_matrix(transmit_params(UNUSED, out_matrix, param), init_by_random);
 }
 
@@ -120,17 +120,17 @@ int init_matrix_as_unit(MODIFIED matrix *out_matrix){
 
 
 int init_matrix_by_function(MODIFIED matrix *in_matrix, init_user foo){
-	if(matrix_exists(in_matrix)){
+  if(matrix_exists(in_matrix)){
     for(int i = 0; i < in_matrix->n_rows; i++){
       for(int j = 0; j < in_matrix->n_columns; j++){
-				in_matrix->array[i][j] = foo(i, j);
+        in_matrix->array[i][j] = foo(i, j);
       }
     }
     return true;
   }
   else{};
 
-	return false;
+  return false;
 }
 
 
@@ -175,8 +175,8 @@ double determinant(IN const matrix *in_matrix){
     for(int i = 0; i < in_matrix->n_rows; i++){
       result *= triangle.array[i][i];
     }
-		result *= pow(-1, triangle.n_permutations);
-		printf("permutations: %d\n", triangle.n_permutations);
+    result *= pow(-1, triangle.n_permutations);
+    printf("permutations: %d\n", triangle.n_permutations);
     delete_matrix(&triangle);
     return result;
   }
@@ -188,18 +188,18 @@ double determinant(IN const matrix *in_matrix){
 
 
 int rank(IN const matrix *in_matrix){
-	matrix tmp = make_matrix(0,0);
-	copy_matrix(in_matrix, &tmp);
-	triangle_form(&tmp, &tmp);
-	int result = tmp.n_rows;
-	for(int i = 0; i < tmp.n_rows; ++i){
-		for(int j = tmp.n_columns-1; i >= 0; --j){
-			if(tmp.array[i][j] != 0) break;
-			if(j == 0) --result;
-		}
-	}
-	delete_matrix(&tmp);
-	return result;
+  matrix tmp = make_matrix(0,0);
+  copy_matrix(in_matrix, &tmp);
+  triangle_form(&tmp, &tmp);
+  int result = tmp.n_rows;
+  for(int i = 0; i < tmp.n_rows; ++i){
+    for(int j = tmp.n_columns-1; i >= 0; --j){
+      if(tmp.array[i][j] != 0) break;
+      if(j == 0) --result;
+    }
+  }
+  delete_matrix(&tmp);
+  return result;
 }
 
 
@@ -212,30 +212,30 @@ int copy_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
     delete_matrix(out_matrix);
     *out_matrix = make_matrix(in_matrix->n_rows, in_matrix->n_columns);
     status = status && walk_on_matrix(transmit_params(in_matrix, out_matrix, UNUSED), copy_element);
-		out_matrix->n_permutations = in_matrix->n_permutations;
+	  out_matrix->n_permutations = in_matrix->n_permutations;
     return status;
   }
   else{};
 
-	return false;
+  return false;
 }
 
 
 int delete_matrix(matrix *in_matrix){
-	if(matrix_exists(in_matrix)){
-		for(int i = 0; i < in_matrix->n_rows; i++){
-			if(in_matrix->array){
-				free(in_matrix->array[i]);
-				in_matrix->array[i] = NULL;
-			}
-		}
-		free(in_matrix->array);
-		in_matrix->array = NULL;
-		return true;
-	}
-	else{};
+  if(matrix_exists(in_matrix)){
+    for(int i = 0; i < in_matrix->n_rows; i++){
+      if(in_matrix->array){
+        free(in_matrix->array[i]);
+        in_matrix->array[i] = NULL;
+      }
+    }
+    free(in_matrix->array);
+    in_matrix->array = NULL;
+    return true;
+  }
+  else{};
 
-	return false;
+  return false;
 }
 
 
@@ -247,12 +247,12 @@ int rows_swap(int i_row_1, int i_row_2, MODIFIED matrix *in_matrix){
       in_matrix->array[i_row_1][i] = in_matrix->array[i_row_2][i];
       in_matrix->array[i_row_2][i] = buf;
     }
-		++(in_matrix->n_permutations);
+    ++(in_matrix->n_permutations);
     return true;
   }
   else{};
 
-	return false;
+  return false;
 }
 
 
@@ -309,7 +309,7 @@ int rows_sub(
   }
   else{};
 
-	return false;
+  return false;
 }
 
 
@@ -346,7 +346,7 @@ int copy_row_to_other_matrix(
   }
   else{};
 
-	return false;
+  return false;
 }
 
 
@@ -357,12 +357,12 @@ int copy_column_to_other_matrix(
   OUT matrix *out_matrix )
 {
   int status = true;
-	matrix tmp = make_matrix(0,0);
+  matrix tmp = make_matrix(0,0);
   status = status && transpose(in_matrix, &tmp);
   status = status && transpose(out_matrix, out_matrix);
   status = status && copy_row_to_other_matrix(i_source, i_receiver, &tmp, out_matrix);
   status = status && transpose(out_matrix, out_matrix);
-	status = status && delete_matrix(&tmp);
+  status = status && delete_matrix(&tmp);
   return status;
 }
 
@@ -372,7 +372,7 @@ int inverse_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
      && in_matrix->n_columns == in_matrix->n_rows
      && determinant(in_matrix) != 0)
   {
-		int status = true;
+    int status = true;
 		
     matrix result = make_matrix(in_matrix->n_rows, in_matrix->n_columns);
     matrix tmp = make_matrix(0,0);    
@@ -420,7 +420,7 @@ int indexes_are_right(int index_1, int index_2, int max_val){
 
 
 int triangle_form_of_augmented_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix, OUT matrix *half_an_inverted_matrix){
-	int status = true;
+  int status = true;
   matrix result = make_matrix(0,0);
   matrix result_2 = make_matrix(in_matrix->n_rows,in_matrix->n_columns);
   status = status && copy_matrix(in_matrix, &result);
@@ -429,15 +429,15 @@ int triangle_form_of_augmented_matrix(IN const matrix *in_matrix, OUT matrix *ou
   double tmp = 0;
   for(int i = 0; i < result.n_columns; i++){
 
-	for(int k = i+1; k < result.n_rows; k++){
-			if(result.array[i][i] != 0){
-				break;
-				}
-			else{
-				status = status && rows_swap(i, k, &result);
-     		status = status && rows_swap(i, k, &result_2);
-			}
-		}
+    for(int k = i+1; k < result.n_rows; k++){
+      if(result.array[i][i] != 0){
+        break;
+      }
+      else{
+        status = status && rows_swap(i, k, &result);
+        status = status && rows_swap(i, k, &result_2);
+      }
+    }
 		
     for(int j = 1+i; j < result.n_rows; j++){
 			
@@ -466,11 +466,11 @@ int triangle_form_of_augmented_matrix(IN const matrix *in_matrix, OUT matrix *ou
 
 int walk_on_matrix(iomatr matr, action foo)
 {
-	int n_rows = 0;
-	int n_columns = 0;
+  int n_rows = 0;
+  int n_columns = 0;
   if(matrix_exists(matr.in_matrix) || matrix_exists(matr.out_matrix)){
-		n_rows = matrix_exists(matr.in_matrix) ? matr.in_matrix->n_rows : matr.out_matrix->n_rows;
-		n_columns = matrix_exists(matr.in_matrix) ? matr.in_matrix->n_columns : matr.out_matrix->n_columns;
+    n_rows = matrix_exists(matr.in_matrix) ? matr.in_matrix->n_rows : matr.out_matrix->n_rows;
+    n_columns = matrix_exists(matr.in_matrix) ? matr.in_matrix->n_columns : matr.out_matrix->n_columns;
     for(int i = 0; i < n_rows; i++){
       for(int j = 0; j < n_columns; j++){
         foo(i, j, matr);
@@ -486,9 +486,9 @@ int walk_on_matrix(iomatr matr, action foo)
 
 void init_by_random(int i_row, int i_column, iomatr matr)
 {
-	srand((int)time(NULL)+(rand()));
-	int32_t up = (int32_t)((((int64_t)matr.param) & FIRST_HALF_OF_WORD) >> LENGHT_OF_WORD/2);
-	int32_t down = (int32_t)((int64_t)matr.param & SECOND_HALF_OF_WORD);
+  srand((int)time(NULL)+(rand()));
+  int32_t up = (int32_t)((((int64_t)matr.param) & FIRST_HALF_OF_WORD) >> LENGHT_OF_WORD/2);
+  int32_t down = (int32_t)((int64_t)matr.param & SECOND_HALF_OF_WORD);
   matr.out_matrix->array[i_row][i_column] = ((rand() % (up-down+1)) + down);
 }
 
@@ -532,9 +532,9 @@ void transpon(int i_row, int i_column, iomatr matr)
 
 
 iomatr transmit_params(const matrix *in_matrix, matrix *out_matrix, double param){
-	iomatr result = {0};
-	result.in_matrix = in_matrix;
-	result.out_matrix = out_matrix;
-	result.param = param;
-	return result;
+  iomatr result = {0};
+  result.in_matrix = in_matrix;
+  result.out_matrix = out_matrix;
+  result.param = param;
+  return result;
 }

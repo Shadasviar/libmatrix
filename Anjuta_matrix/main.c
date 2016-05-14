@@ -23,7 +23,7 @@
 #include <time.h>
 
 int main(){
-     int a, b;
+   	int a, b;
     a = b = 0;
 
     puts("Enter size of matrix");
