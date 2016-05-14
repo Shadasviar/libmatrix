@@ -38,7 +38,7 @@ int main(){
 
     matrix res = make_matrix(a, 1);
     if(inverse_matrix(&matr, &matr)){
-        multiplex_matrixes(&matr, &results, &res);
+        multiplex_matrices(&matr, &results, &res);
         puts("Results:");
         show_matrix(&res);
     }
@@ -47,11 +47,11 @@ int main(){
 
         matrix pseudo = make_matrix(0,0);
         matrix tmp = make_matrix(0,0);
-        transponent(&matr, &tmp);
-        multiplex_matrixes(&tmp, &matr, &pseudo);
+        transpose(&matr, &tmp);
+        multiplex_matrices(&tmp, &matr, &pseudo);
         inverse_matrix(&pseudo, &pseudo);
-        multiplex_matrixes(&pseudo, &tmp, &pseudo);
-        multiplex_matrixes(&pseudo, &results, &res);
+        multiplex_matrices(&pseudo, &tmp, &pseudo);
+        multiplex_matrices(&pseudo, &results, &res);
 
         puts("Optimal roots are:");
         show_matrix(&res);

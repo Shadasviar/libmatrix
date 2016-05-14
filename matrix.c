@@ -83,24 +83,24 @@ int show_matrix(IN const matrix *in_matrix){
 }
 
 
-int init_matrix(MODYFIED matrix *out_matrix){
+int init_matrix(MODIFIED matrix *out_matrix){
   return walk_on_matrix(transmit_params(UNUSED, out_matrix, UNUSED), init);
 }
 
 
-int init_matrix_by_random(MODYFIED matrix *out_matrix, int32_t down, int32_t up){ 
+int init_matrix_by_random(MODIFIED matrix *out_matrix, int32_t down, int32_t up){ 
 	int64_t tmp = ((int64_t)up << LENGHT_OF_WORD/2) + down;
 	double param = (double)(tmp);
   return walk_on_matrix(transmit_params(UNUSED, out_matrix, param), init_by_random);
 }
 
 
-int init_matrix_as_unit(MODYFIED matrix *out_matrix){
+int init_matrix_as_unit(MODIFIED matrix *out_matrix){
   return walk_on_matrix(transmit_params(UNUSED, out_matrix, UNUSED), init_as_unit);
 }
 
 
-int init_matrix_by_function(MODYFIED matrix *in_matrix, init_user foo){
+int init_matrix_by_function(MODIFIED matrix *in_matrix, init_user foo){
 	if(matrix_exists(in_matrix)){
     for(int i = 0; i < in_matrix->n_rows; i++){
       for(int j = 0; j < in_matrix->n_columns; j++){
@@ -115,7 +115,7 @@ int init_matrix_by_function(MODYFIED matrix *in_matrix, init_user foo){
 }
 
 
-int transponent(IN const matrix *in_matrix, OUT matrix *out_matrix){
+int transpose(IN const matrix *in_matrix, OUT matrix *out_matrix){
   int status = true;
   matrix result = make_matrix(in_matrix->n_columns, in_matrix->n_rows);
   status = status && walk_on_matrix(transmit_params(in_matrix, &result, UNUSED), transpon);
@@ -125,7 +125,7 @@ int transponent(IN const matrix *in_matrix, OUT matrix *out_matrix){
 }
 
 
-int multiplex_matrixes(IN const matrix *in_matrix_1, IN const matrix *in_matrix_2, OUT matrix *out_matrix){
+int multiplex_matrices(IN const matrix *in_matrix_1, IN const matrix *in_matrix_2, OUT matrix *out_matrix){
   if(in_matrix_2->n_rows == in_matrix_1->n_columns){
 
     matrix result = make_matrix(in_matrix_1->n_rows, in_matrix_2->n_columns);
@@ -220,7 +220,7 @@ int delete_matrix(matrix *in_matrix){
 }
 
 
-int rows_swap(int i_row_1, int i_row_2, MODYFIED matrix *in_matrix){
+int rows_swap(int i_row_1, int i_row_2, MODIFIED matrix *in_matrix){
   if(indexes_are_right(i_row_1, i_row_2, in_matrix->n_rows)){
     double buf = 0;
     for(int i = 0; i < in_matrix->n_columns; i++){
@@ -237,11 +237,11 @@ int rows_swap(int i_row_1, int i_row_2, MODYFIED matrix *in_matrix){
 }
 
 
-int columns_swap(int i_col_1, int i_col_2, MODYFIED matrix *in_matrix){
+int columns_swap(int i_col_1, int i_col_2, MODIFIED matrix *in_matrix){
   int status = true;
-  status = status && transponent(in_matrix, in_matrix);
+  status = status && transpose(in_matrix, in_matrix);
   status = status && rows_swap(i_col_1, i_col_2, in_matrix);
-  status = status && transponent(in_matrix, in_matrix);
+  status = status && transpose(in_matrix, in_matrix);
   return status;
 }
 
@@ -251,7 +251,7 @@ int triangle_form(IN const matrix *in_matrix, OUT matrix *out_matrix){
 }
 
 
-int row_mult_on_const(double factor, int i_row, MODYFIED matrix *out_matrix){
+int row_mult_on_const(double factor, int i_row, MODIFIED matrix *out_matrix){
   if(indexes_are_right(i_row, UNUSED, out_matrix->n_rows) && matrix_exists(out_matrix)){
     int status = true;
     matrix tmp = make_matrix(1, out_matrix->n_columns);
@@ -267,11 +267,11 @@ int row_mult_on_const(double factor, int i_row, MODYFIED matrix *out_matrix){
 }
 
 
-int column_mult_on_const(double factor, int i_column, MODYFIED matrix *out_matrix){
+int column_mult_on_const(double factor, int i_column, MODIFIED matrix *out_matrix){
   int status = true;
-  status = status && transponent(out_matrix, out_matrix);
+  status = status && transpose(out_matrix, out_matrix);
   status = status && row_mult_on_const(factor, i_column, out_matrix);
-  status = status && transponent(out_matrix, out_matrix);
+  status = status && transpose(out_matrix, out_matrix);
   return status;
 }
 
@@ -280,7 +280,7 @@ int rows_sub(
   double factor,
   int i_subtracted_row,
   int i_subtracting_row,
-  MODYFIED matrix *out_matrix)
+  MODIFIED matrix *out_matrix)
 {
   if(indexes_are_right(i_subtracted_row, i_subtracting_row, out_matrix->n_rows) && matrix_exists(out_matrix)){
     for(int i = 0; i < out_matrix->n_columns; i++){
@@ -298,30 +298,30 @@ int columns_sub(
   double factor,
   int i_subtracted_column,
   int i_subtracting_column,
-  MODYFIED matrix *out_matrix)
+  MODIFIED matrix *out_matrix)
 {
   int status = true;
-  status = status && transponent(out_matrix, out_matrix);
+  status = status && transpose(out_matrix, out_matrix);
   status = status && rows_sub(factor, i_subtracted_column, i_subtracting_column, out_matrix);
-  status = status && transponent(out_matrix, out_matrix);
+  status = status && transpose(out_matrix, out_matrix);
   return status;
 }
 
 
 int copy_row_to_other_matrix(
   int i_source,
-  int i_reciever,
+  int i_receiver,
   IN const matrix *in_matrix,
   OUT matrix *out_matrix )
 {
   if(matrix_exists(in_matrix) 
     && matrix_exists(out_matrix)
     && indexes_are_right(i_source, UNUSED, in_matrix->n_rows)
-    && indexes_are_right(i_reciever, UNUSED, out_matrix->n_rows)
+    && indexes_are_right(i_receiver, UNUSED, out_matrix->n_rows)
     && in_matrix->n_columns == out_matrix->n_columns)
   {
     for(int i = 0; i < in_matrix->n_columns; i++){
-      out_matrix->array[i_reciever][i] = in_matrix->array[i_source][i];
+      out_matrix->array[i_receiver][i] = in_matrix->array[i_source][i];
     }
     return true;
   }
@@ -333,16 +333,16 @@ int copy_row_to_other_matrix(
 
 int copy_column_to_other_matrix(
   int i_source,
-  int i_reciever,
+  int i_receiver,
   IN const matrix *in_matrix,
   OUT matrix *out_matrix )
 {
   int status = true;
 	matrix tmp = make_matrix(0,0);
-  status = status && transponent(in_matrix, &tmp);
-  status = status && transponent(out_matrix, out_matrix);
-  status = status && copy_row_to_other_matrix(i_source, i_reciever, &tmp, out_matrix);
-  status = status && transponent(out_matrix, out_matrix);
+  status = status && transpose(in_matrix, &tmp);
+  status = status && transpose(out_matrix, out_matrix);
+  status = status && copy_row_to_other_matrix(i_source, i_receiver, &tmp, out_matrix);
+  status = status && transpose(out_matrix, out_matrix);
 	status = status && delete_matrix(&tmp);
   return status;
 }

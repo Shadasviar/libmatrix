@@ -3,66 +3,64 @@
 #include <stdlib.h>
 #include <time.h>
 
-
-double foo(int i, int j){
-	return i + 5*j;
-}
-
-
 int main(){
-  unsigned int n_rows, n_columns;
-  n_rows = n_columns = 0;
+     int a, b;
+    a = b = 0;
 
-  puts("Enter number of lines and columns of matrix of equations");
-  scanf("%u%u", &n_rows, &n_columns);
-  matrix equations = make_matrix(n_rows, n_columns);
-	srand((int)time(NULL));
-  init_matrix_by_random(&equations);
+    puts("Enter size of matrix");
+    scanf("%d%d", &a, &b);
 
-  puts("Enter vector of results");
+    matrix matr = make_matrix(a, b);
+    init_matrix(&matr);
 
-	int a;
-	scanf("%d", &a);
+		puts("DEBUG:");
+		matrix tmp = make_matrix(a,b);
+		show_matrix(&tmp);
+		copy_column_to_other_matrix(1,1,&matr, &tmp);
+		show_matrix(&tmp);
+		puts("DEBUG:");
+	
+		printf("Determinant: %f\n", determinant(&matr));
+		printf("Rank: %d\n", rank(&matr));
+		matrix pp = make_matrix(0, 0);
+		triangle_form(&matr, &pp);
+		show_matrix(&pp);
+		
 
-  matrix results = make_matrix(n_rows, 1);
-  init_matrix_by_random(&results);
-  show_matrix(&equations);
-  puts("-------------------------------------");
+    puts("Enter vector of results");
+    matrix results = make_matrix(a, 1);
+    init_matrix_by_random(&results, 1, 4);
 
-  if(inverse_matrix(&equations, &equations)){
-    puts("inversed");
-  }else{
-    puts("no inversible");
-  }
-  show_matrix(&equations);
-  puts("-------------------------------------");
+    puts("Matrix:");
+    show_matrix(&matr);
+    puts("Results:");
+    show_matrix(&results);
 
-  double det = determinant(&equations);
-  printf("\n det = %.2f\n", det);
-
-  if(det != 0){
-    matrix buf = make_matrix(n_rows, 1);
-
-    double det_x;
-
-    for(int i = 0; i < equations.n_columns; i++){
-      copy_column_to_other_matrix(i, 0, &equations, &buf);
-      copy_column_to_other_matrix(0, i, &results, &equations);
-
-      det_x = determinant(&equations);
-      printf("x%i = %.2f\n", i, det_x/det);
-
-      copy_column_to_other_matrix(0, i, &buf, &equations);
+    matrix res = make_matrix(a, 1);
+    if(inverse_matrix(&matr, &matr)){
+        multiplex_matrices(&matr, &results, &res);
+        puts("Results:");
+        show_matrix(&res);
     }
-    delete_matrix(&buf);
-  }
-  else{
-    puts("equations have infinity roots or don't have it");
-  }
-  delete_matrix(&equations);
-  delete_matrix(&results);
+    else{
+        puts("no roots, sorry");
 
-	scanf("%d", &a);
+        matrix pseudo = make_matrix(0,0);
+        matrix tmp = make_matrix(0,0);
+        transpose(&matr, &tmp);
+        multiplex_matrices(&tmp, &matr, &pseudo);
+        inverse_matrix(&pseudo, &pseudo);
+        multiplex_matrices(&pseudo, &tmp, &pseudo);
+        multiplex_matrices(&pseudo, &results, &res);
 
-  return 0;
+        puts("Optimal roots are:");
+        show_matrix(&res);
+				delete_matrix(&pseudo);
+				delete_matrix(&tmp);
+    }
+
+		delete_matrix(&matr);
+		delete_matrix(&results);
+		delete_matrix(&res);
+    return 0;
 }
