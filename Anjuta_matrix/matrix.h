@@ -43,13 +43,14 @@ typedef struct{
   int n_rows;
   int n_columns;
   double **array;
-	int n_permutations;
+  int n_permutations;
 }matrix;
 
 
 typedef double(*init_user)(int, int);
 
-matrix make_matrix(int n_rows, int n_columns); // Do not use it on existing matrixes!!!
+/*Do not use it on existing matrixes!!!*/
+matrix make_matrix(int n_rows, int n_columns); 
 
 double determinant(IN const matrix*);
 int rank(IN const matrix*);
@@ -76,8 +77,8 @@ int column_mult_on_const(double factor, int i_column, MODIFIED matrix*);
 int rows_sub(double factor, int i_subtracted_row, int i_subtracting_row, MODIFIED matrix*);
 int columns_sub(double factor, int i_subtracted_column, int i_subtracting_column, MODIFIED matrix*);
 
-int copy_row_to_other_matrix(int i_source, int i_receiver, IN const matrix *in_matrix, OUT matrix *out_matrix);
-int copy_column_to_other_matrix(int i_source, int i_receiver, IN const matrix *in_matrix, OUT matrix *out_matrix);
+int copy_row_to_other_matrix(int i_source, int i_receiver, IN const matrix*, OUT matrix*);
+int copy_column_to_other_matrix(int i_source, int i_receiver, IN const matrix*, OUT matrix*);
 
-int inverse_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix);
+int inverse_matrix(IN const matrix*, OUT matrix*);
 

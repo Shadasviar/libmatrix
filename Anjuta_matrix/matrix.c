@@ -22,7 +22,6 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
@@ -49,7 +48,10 @@ typedef struct{
 
 typedef void (*action)(int, int, iomatr);
 
-
+/*This function transmitts own parameters to
+ *walk_on_matrix function if call it in the 
+ *parameters list of walk_on_matrix. 
+ */
 iomatr transmit_params(IN const matrix*, OUT matrix*, double );
 
 int walk_on_matrix(iomatr, action);
@@ -193,7 +195,7 @@ int rank(IN const matrix *in_matrix){
   triangle_form(&tmp, &tmp);
   int result = tmp.n_rows;
   for(int i = 0; i < tmp.n_rows; ++i){
-    for(int j = tmp.n_columns-1; i >= 0; --j){
+    for(int j = tmp.n_columns-1; j >= 0; --j){
       if(tmp.array[i][j] != 0) break;
       if(j == 0) --result;
     }
@@ -224,7 +226,7 @@ int copy_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
 int delete_matrix(matrix *in_matrix){
   if(matrix_exists(in_matrix)){
     for(int i = 0; i < in_matrix->n_rows; i++){
-      if(in_matrix->array){
+      if(in_matrix->array[i]){
         free(in_matrix->array[i]);
         in_matrix->array[i] = NULL;
       }
@@ -282,7 +284,7 @@ int row_mult_on_const(double factor, int i_row, MODIFIED matrix *out_matrix){
   }
   else{};
 
-	return false;
+  return false;
 }
 
 
@@ -400,7 +402,7 @@ int inverse_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
   }
   else{};
 
-	return false;
+  return false;
 }
 
 
@@ -466,11 +468,9 @@ int triangle_form_of_augmented_matrix(IN const matrix *in_matrix, OUT matrix *ou
 
 int walk_on_matrix(iomatr matr, action foo)
 {
-  int n_rows = 0;
-  int n_columns = 0;
   if(matrix_exists(matr.in_matrix) || matrix_exists(matr.out_matrix)){
-    n_rows = matrix_exists(matr.in_matrix) ? matr.in_matrix->n_rows : matr.out_matrix->n_rows;
-    n_columns = matrix_exists(matr.in_matrix) ? matr.in_matrix->n_columns : matr.out_matrix->n_columns;
+    int n_rows = matrix_exists(matr.in_matrix) ? matr.in_matrix->n_rows : matr.out_matrix->n_rows;
+    int n_columns = matrix_exists(matr.in_matrix) ? matr.in_matrix->n_columns : matr.out_matrix->n_columns;
     for(int i = 0; i < n_rows; i++){
       for(int j = 0; j < n_columns; j++){
         foo(i, j, matr);
