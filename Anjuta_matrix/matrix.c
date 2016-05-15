@@ -90,8 +90,7 @@ matrix make_matrix(int n_rows, int n_columns){
     else NOT_ENOUGH_MEMORY_EXIT;
   }
 
-  matrix result = {n_rows, n_columns, array, 0};
-  return result;
+  return (matrix) {n_rows, n_columns, array, 0};
 }
 
 
@@ -517,6 +516,5 @@ void transpon(int i_row, int i_column, iomatr matr){
 
 
 iomatr transmit_params(const matrix *in_matrix, matrix *out_matrix, void *param){
-  iomatr result = { in_matrix, out_matrix, param};
-  return result;
+  return (iomatr) { in_matrix, out_matrix, param};
 }
