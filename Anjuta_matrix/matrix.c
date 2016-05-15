@@ -43,7 +43,7 @@
 typedef struct{
   IN const matrix *in_matrix;
   OUT matrix *out_matrix;
-  double param;
+  void *param;
 }iomatr;
 
 typedef void (*action)(int, int, iomatr);
@@ -52,14 +52,18 @@ typedef void (*action)(int, int, iomatr);
  *walk_on_matrix function if call it in the 
  *parameters list of walk_on_matrix. 
  */
-iomatr transmit_params(IN const matrix*, OUT matrix*, double );
+iomatr transmit_params(IN const matrix*, OUT matrix*, void* );
 
+/*Do action with every element of matrices in
+ * the iomatr
+ */
 int walk_on_matrix(iomatr, action);
 
 inline void show(int, int, iomatr);
 inline void init(int, int, iomatr);
 inline void init_by_random(int, int, iomatr);
 inline void init_as_unit(int, int, iomatr);
+inline void init_by_foo(int, int, iomatr);
 inline void mult(int, int, iomatr);
 inline void copy_element(int, int, iomatr);
 inline void transpon(int, int, iomatr);
@@ -112,7 +116,7 @@ int init_matrix(MODIFIED matrix *out_matrix){
 int init_matrix_by_random(MODIFIED matrix *out_matrix, int32_t down, int32_t up){ 
   int64_t tmp = ((int64_t)up << LENGHT_OF_WORD/2) + down;
   double param = (double)(tmp);
-  return walk_on_matrix(transmit_params(UNUSED, out_matrix, param), init_by_random);
+  return walk_on_matrix(transmit_params(UNUSED, out_matrix, &param), init_by_random);
 }
 
 
@@ -122,17 +126,7 @@ int init_matrix_as_unit(MODIFIED matrix *out_matrix){
 
 
 int init_matrix_by_function(MODIFIED matrix *in_matrix, init_user foo){
-  if(matrix_exists(in_matrix)){
-    for(int i = 0; i < in_matrix->n_rows; i++){
-      for(int j = 0; j < in_matrix->n_columns; j++){
-        in_matrix->array[i][j] = foo(i, j);
-      }
-    }
-    return true;
-  }
-  else{};
-
-  return false;
+ return walk_on_matrix(transmit_params(UNUSED, in_matrix, foo), init_by_foo);
 }
 
 
@@ -151,7 +145,7 @@ int multiplex_matrices(IN const matrix *in_matrix_1, IN const matrix *in_matrix_
 
     matrix result = make_matrix(in_matrix_1->n_rows, in_matrix_2->n_columns);
 
-    for(int i = 0; i < result.n_rows ;i++){
+    for(int i = 0; i < result.n_rows ; i++){
       for(int j = 0; j < result.n_columns; j++){
         for(int k = 0; k < in_matrix_1->n_columns; k++){
           result.array[i][j] += in_matrix_1->array[i][k] * in_matrix_2->array[k][j];
@@ -281,7 +275,7 @@ int row_mult_on_const(double factor, int i_row, MODIFIED matrix *out_matrix){
     matrix tmp = make_matrix(1, out_matrix->n_columns);
     free(tmp.array[0]);
     tmp.array[0] = out_matrix->array[i_row];		
-    status = status && walk_on_matrix(transmit_params(UNUSED, &tmp, factor), mult);
+    status = status && walk_on_matrix(transmit_params(UNUSED, &tmp, &factor), mult);
     free(tmp.array);
     return status;
   }
@@ -492,8 +486,8 @@ int walk_on_matrix(iomatr matr, action foo){
 
 void init_by_random(int i_row, int i_column, iomatr matr){
   srand((int)time(NULL)+(rand()));
-  int32_t up = (int32_t)((((int64_t)matr.param) & FIRST_HALF_OF_WORD) >> LENGHT_OF_WORD/2);
-  int32_t down = (int32_t)((int64_t)matr.param & SECOND_HALF_OF_WORD);
+  int32_t up = (int32_t)(((*(int64_t*)matr.param) & FIRST_HALF_OF_WORD) >> LENGHT_OF_WORD/2);
+  int32_t down = (int32_t)(*(int64_t*)matr.param & SECOND_HALF_OF_WORD);
   matr.out_matrix->array[i_row][i_column] = ((rand() % (up-down+1)) + down);
 }
 
@@ -515,8 +509,14 @@ void init_as_unit(int i_row, int i_column, iomatr matr){
 }
 
 
+void init_by_foo(int i_row, int i_column, iomatr matr){
+  init_user foo = (init_user)matr.param;
+  matr.out_matrix->array[i_row][i_column] = foo(i_row, i_column);
+}
+
+
 void mult(int i_row, int i_column, iomatr matr){
-  matr.out_matrix->array[i_row][i_column] *= matr.param;
+  matr.out_matrix->array[i_row][i_column] *= *(double*)matr.param;
 }
 
 
@@ -530,7 +530,7 @@ void transpon(int i_row, int i_column, iomatr matr){
 }
 
 
-iomatr transmit_params(const matrix *in_matrix, matrix *out_matrix, double param){
+iomatr transmit_params(const matrix *in_matrix, matrix *out_matrix, void *param){
   iomatr result = {0};
   result.in_matrix = in_matrix;
   result.out_matrix = out_matrix;

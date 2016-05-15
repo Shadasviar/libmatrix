@@ -22,6 +22,10 @@
 #include <stdlib.h>
 #include <time.h>
 
+double foo(int a, int b){
+	return a+b;
+}
+
 int main(){
    	int a, b;
     a = b = 0;
@@ -30,7 +34,7 @@ int main(){
     scanf("%d%d", &a, &b);
 
     matrix matr = make_matrix(a, b);
-    init_matrix(&matr);
+    init_matrix_by_function(&matr, foo);
 
 		puts("DEBUG:");
 		matrix tmp = make_matrix(a,b);
