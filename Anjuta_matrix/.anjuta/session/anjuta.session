@@ -2,16 +2,16 @@
 Maximized=1
 Geometry=1920x1002+0+41
 
-[File Loader]
-Files=../../main.c#26%%%../../matrix.h#80%%%../../matrix.c#148%%%../../Makefile#8
-
-[Document Manager]
-bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
-
 [Execution]
 Program uri=../../matrix
 Run in terminal=2
 Working directories=../../.
+
+[File Loader]
+Files=../../main.c#12%%%../../matrix.h#71%%%../../matrix.c#445%%%../../Makefile#1
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
 
 [Debugger]
 Breakpoint=1:../../main.c:8:0:

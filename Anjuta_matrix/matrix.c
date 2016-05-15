@@ -26,7 +26,6 @@
 #include <time.h>
 #include <math.h>
 
-/* WORD means double's size */
 #define FIRST_HALF_OF_WORD 0xFFFFFFFF00000000
 #define SECOND_HALF_OF_WORD 0x00000000FFFFFFFF
 #define FULL_WORD 0xFFFFFFFFFFFFFFFF
@@ -80,7 +79,6 @@ int triangle_form_of_augmented_matrix(IN const matrix*, OUT matrix*, OUT matrix*
 
 
 matrix make_matrix(int n_rows, int n_columns){
-  matrix result;
 
   double **array = (double**) calloc(n_rows, sizeof(*array));
   if(array == NULL) NOT_ENOUGH_MEMORY_EXIT;
@@ -89,16 +87,10 @@ matrix make_matrix(int n_rows, int n_columns){
     if(array[i] != NULL){
       memset(array[i], 0.0, n_columns * sizeof(*array[i]));
     }
-    else{
-      NOT_ENOUGH_MEMORY_EXIT;
-    }
+    else NOT_ENOUGH_MEMORY_EXIT;
   }
 
-  result.n_columns = n_columns;
-  result.n_rows = n_rows;
-  result.array = array;
-  result.n_permutations = 0;
-
+  matrix result = {n_rows, n_columns, array, 0};
   return result;
 }
 
@@ -114,8 +106,7 @@ int init_matrix(MODIFIED matrix *out_matrix){
 
 
 int init_matrix_by_random(MODIFIED matrix *out_matrix, int32_t down, int32_t up){ 
-  int64_t tmp = ((int64_t)up << LENGHT_OF_WORD/2) + down;
-  double param = (double)(tmp);
+  int64_t param = ((int64_t)up << LENGHT_OF_WORD/2) + down;
   return walk_on_matrix(transmit_params(UNUSED, out_matrix, &param), init_by_random);
 }
 
@@ -156,9 +147,8 @@ int multiplex_matrices(IN const matrix *in_matrix_1, IN const matrix *in_matrix_
     delete_matrix(&result);
     return true;
   }
-  else{
-    return false;
-  }
+  else{}
+  return false;
 }
 
 
@@ -172,7 +162,6 @@ double determinant(IN const matrix *in_matrix){
       result *= triangle.array[i][i];
     }
     result *= pow(-1, triangle.n_permutations);
-    printf("permutations: %d\n", triangle.n_permutations);
     delete_matrix(&triangle);
     return result;
   }
@@ -184,7 +173,7 @@ double determinant(IN const matrix *in_matrix){
 
 
 int rank(IN const matrix *in_matrix){
-	if(matrix_exists(in_matrix)){
+  if(matrix_exists(in_matrix)){
     matrix tmp = make_matrix(0,0);
     copy_matrix(in_matrix, &tmp);
     triangle_form(&tmp, &tmp);
@@ -211,7 +200,7 @@ int copy_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
     delete_matrix(out_matrix);
     *out_matrix = make_matrix(in_matrix->n_rows, in_matrix->n_columns);
     status = status && walk_on_matrix(transmit_params(in_matrix, out_matrix, UNUSED), copy_element);
-	  out_matrix->n_permutations = in_matrix->n_permutations;
+    out_matrix->n_permutations = in_matrix->n_permutations;
     return status;
   }
   else{};
@@ -453,9 +442,7 @@ int triangle_form_of_augmented_matrix(
         status = status && row_mult_on_const(1/result.array[i][i], j, &result);
         status = status && row_mult_on_const(1/result.array[i][i], j, &result_2);
       }
-      else{
-        continue;
-      }
+      else continue;
     }
   }
 
@@ -478,9 +465,8 @@ int walk_on_matrix(iomatr matr, action foo){
     }
     return true;
   }
-  else{
-    return false;
-  }
+  else{}
+  return false;
 }
 
 
@@ -531,9 +517,6 @@ void transpon(int i_row, int i_column, iomatr matr){
 
 
 iomatr transmit_params(const matrix *in_matrix, matrix *out_matrix, void *param){
-  iomatr result = {0};
-  result.in_matrix = in_matrix;
-  result.out_matrix = out_matrix;
-  result.param = param;
+  iomatr result = { in_matrix, out_matrix, param};
   return result;
 }

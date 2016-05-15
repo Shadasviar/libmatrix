@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 2; tab-width: 2 -*-  */
 /*
- * matrix.c
+ * main.c
  * Copyright (C) Uladzislau Harbuz 2016 
  * 
  * libmatrix is free software: you can redistribute it and/or modify it
@@ -23,7 +23,7 @@
 #include <time.h>
 
 double foo(int a, int b){
-	return a+b;
+	return (a==b) ? 1 : 0;
 }
 
 int main(){
@@ -34,7 +34,7 @@ int main(){
     scanf("%d%d", &a, &b);
 
     matrix matr = make_matrix(a, b);
-    init_matrix_by_function(&matr, foo);
+    init_matrix_by_random(&matr, 1,10);
 
 		puts("DEBUG:");
 		matrix tmp = make_matrix(a,b);
@@ -52,7 +52,7 @@ int main(){
 
     puts("Enter vector of results");
     matrix results = make_matrix(a, 1);
-    init_matrix_by_random(&results, 1, 4);
+    init_matrix_by_random(&results, 1, 10);
 
     puts("Matrix:");
     show_matrix(&matr);
