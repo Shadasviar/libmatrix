@@ -8,7 +8,7 @@ Run in terminal=2
 Working directories=../../.
 
 [File Loader]
-Files=../../main.c#12%%%../../matrix.h#71%%%../../matrix.c#93%%%../../Makefile#1
+Files=../../main.c#12%%%../../matrix.h#71%%%../../matrix.c#264%%%../../Makefile#1
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n

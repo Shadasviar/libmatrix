@@ -63,7 +63,6 @@ inline void init(int, int, iomatr);
 inline void init_by_random(int, int, iomatr);
 inline void init_as_unit(int, int, iomatr);
 inline void init_by_foo(int, int, iomatr);
-inline void mult(int, int, iomatr);
 inline void copy_element(int, int, iomatr);
 inline void transpon(int, int, iomatr);
 
@@ -259,13 +258,10 @@ int triangle_form(IN const matrix *in_matrix, OUT matrix *out_matrix){
 
 int row_mult_on_const(double factor, int i_row, MODIFIED matrix *out_matrix){
   if(indexes_are_right(i_row, UNUSED, out_matrix->n_rows) && matrix_exists(out_matrix)){
-    int status = true;
-    matrix tmp = make_matrix(1, out_matrix->n_columns);
-    free(tmp.array[0]);
-    tmp.array[0] = out_matrix->array[i_row];		
-    status = status && walk_on_matrix(transmit_params(UNUSED, &tmp, &factor), mult);
-    free(tmp.array);
-    return status;
+    for(int i = 0; i < out_matrix->n_columns; i++){
+      out_matrix->array[i_row][i] *= factor;
+    }
+    return true;
   }
   else{};
 
@@ -497,11 +493,6 @@ void init_as_unit(int i_row, int i_column, iomatr matr){
 void init_by_foo(int i_row, int i_column, iomatr matr){
   init_user foo = (init_user)matr.param;
   matr.out_matrix->array[i_row][i_column] = foo(i_row, i_column);
-}
-
-
-void mult(int i_row, int i_column, iomatr matr){
-  matr.out_matrix->array[i_row][i_column] *= *(double*)matr.param;
 }
 
 
