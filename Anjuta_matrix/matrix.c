@@ -26,11 +26,6 @@
 #include <time.h>
 #include <math.h>
 
-#define FIRST_HALF_OF_WORD 0xFFFFFFFF00000000
-#define SECOND_HALF_OF_WORD 0x00000000FFFFFFFF
-#define FULL_WORD 0xFFFFFFFFFFFFFFFF
-#define LENGHT_OF_WORD 64
-
 #define UNUSED 0
 #define GENERAL_ERR "WARNING: Check your input data. Something gone wrong"
 #define NOT_ENOUGH_MEMORY_EXIT {puts("make_matrix: ERROR: NOT ENOUGH MEMORY"); exit(1);}
@@ -103,9 +98,9 @@ int init_matrix(MODIFIED matrix *out_matrix){
 }
 
 
-int init_matrix_by_random(MODIFIED matrix *out_matrix, int32_t down, int32_t up){ 
-  int64_t param = ((int64_t)up << LENGHT_OF_WORD/2) + down;
-  return walk_on_matrix(transmit_params(UNUSED, out_matrix, &param), init_by_random);
+int init_matrix_by_random(MODIFIED matrix *out_matrix, int down, int up){ 
+  int param[2] = {down, up};
+  return walk_on_matrix(transmit_params(UNUSED, out_matrix, param), init_by_random);
 }
 
 
@@ -467,9 +462,9 @@ int walk_on_matrix(iomatr matr, action foo){
 
 void init_by_random(int i_row, int i_column, iomatr matr){
   srand((int)time(NULL)+(rand()));
-  int32_t up = (int32_t)(((*(int64_t*)matr.param) & FIRST_HALF_OF_WORD) >> LENGHT_OF_WORD/2);
-  int32_t down = (int32_t)(*(int64_t*)matr.param & SECOND_HALF_OF_WORD);
-  matr.out_matrix->array[i_row][i_column] = ((rand() % (up-down+1)) + down);
+  int down = ((int*)matr.param)[0];
+  int up = ((int*)matr.param)[1];
+  matr.out_matrix->array[i_row][i_column] = ((rand() % (up - down + 1)) + down);
 }
 
 

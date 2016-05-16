@@ -34,7 +34,7 @@ int main(){
     scanf("%d%d", &a, &b);
 
     matrix matr = make_matrix(a, b);
-    init_matrix_by_random(&matr, 1,10);
+    init_matrix_by_random(&matr, 1,25);
 
 		puts("DEBUG:");
 		matrix tmp = make_matrix(a,b);
@@ -52,7 +52,7 @@ int main(){
 
     puts("Enter vector of results");
     matrix results = make_matrix(a, 1);
-    init_matrix_by_random(&results, 1, 10);
+    init_matrix_by_random(&results, 1, 2);
 
     puts("Matrix:");
     show_matrix(&matr);
