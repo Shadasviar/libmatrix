@@ -32,7 +32,6 @@
  *
  * */
 
-#include <stdint.h>
 #pragma once
 #define IN
 #define OUT
