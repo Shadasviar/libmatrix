@@ -62,7 +62,7 @@ int triangle_form(IN const matrix*, OUT matrix*);
 
 int show_matrix(IN const matrix*);
 int init_matrix(MODIFIED matrix*);
-int init_matrix_by_random(MODIFIED matrix*, int32_t down, int32_t up);
+int init_matrix_by_random(MODIFIED matrix*, int down, int up);
 int init_matrix_as_unit(MODIFIED matrix*);
 int init_matrix_by_function(MODIFIED matrix*, init_user);
 
