@@ -3,6 +3,8 @@
  * main.c
  * Copyright (C) 2016 
  * 
+ * This file is part of libmatrix. 
+ *
  * libmatrix is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
@@ -34,7 +36,7 @@ int main(){
     scanf("%d%d", &a, &b);
 
     matrix matr = make_matrix(a, b);
-    init_matrix_by_random(&matr, 1,25);
+    init_matrix(&matr);
 
 		puts("DEBUG:");
 		matrix tmp = make_matrix(a,b);
