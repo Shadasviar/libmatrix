@@ -86,7 +86,11 @@ matrix make_matrix(int n_rows, int n_columns){
     else NOT_ENOUGH_MEMORY_EXIT;
   }
 
-  return (matrix) {n_rows, n_columns, array, 0};
+  matrix result = {0};
+  result.n_rows = n_rows;
+  result.n_columns = n_columns;
+  result.array = array;
+  return result;
 }
 
 
@@ -117,18 +121,21 @@ int init_matrix_by_function(MODIFIED matrix *in_matrix, init_user foo){
 
 
 int transpose(IN const matrix *in_matrix, OUT matrix *out_matrix){
-  int status = true;
+  int status = true;  
   matrix result = make_matrix(in_matrix->n_columns, in_matrix->n_rows);
+  
   status = status && walk_on_matrix(transmit_params(in_matrix, &result, UNUSED), transpon);
   status = status && copy_matrix(&result, out_matrix);
+  
   delete_matrix(&result);
+  
   return status;
 }
 
 
 int multiplex_matrices(IN const matrix *in_matrix_1, IN const matrix *in_matrix_2, OUT matrix *out_matrix){
+  
   if(in_matrix_2->n_rows == in_matrix_1->n_columns){
-
     matrix result = make_matrix(in_matrix_1->n_rows, in_matrix_2->n_columns);
 
     for(int i = 0; i < result.n_rows ; i++){
@@ -138,17 +145,19 @@ int multiplex_matrices(IN const matrix *in_matrix_1, IN const matrix *in_matrix_
         }
       }
     }
+    
     copy_matrix(&result, out_matrix);
     delete_matrix(&result);
     return true;
   }
-  else{}
+  
   return false;
 }
 
 
 double determinant(IN const matrix *in_matrix){
-  if(matrix_exists(in_matrix) && in_matrix->n_rows == in_matrix->n_columns){
+  
+  if(matrix_exists(in_matrix) && in_matrix->n_rows == in_matrix->n_columns){    
     double result = 1.0;
     matrix triangle = make_matrix(0,0);
     triangle_form(in_matrix, &triangle);
@@ -156,8 +165,10 @@ double determinant(IN const matrix *in_matrix){
     for(int i = 0; i < in_matrix->n_rows; i++){
       result *= triangle.array[i][i];
     }
+    
     result *= pow(-1, triangle.n_permutations);
     delete_matrix(&triangle);
+    
     return result;
   }
   else{
@@ -168,61 +179,75 @@ double determinant(IN const matrix *in_matrix){
 
 
 int rank(IN const matrix *in_matrix){
+  
   if(matrix_exists(in_matrix)){
+    
     matrix tmp = make_matrix(0,0);
     copy_matrix(in_matrix, &tmp);
     triangle_form(&tmp, &tmp);
+    
     int result = tmp.n_rows;
+    
     for(int i = 0; i < tmp.n_rows; ++i){
       for(int j = tmp.n_columns-1; j >= 0; --j){
+        
         if(tmp.array[i][j] != 0) break;
         if(j == 0) --result;
       }
     }
+    
     delete_matrix(&tmp);
     return result;
   }
+  
   return 0;
 }
 
 
 int copy_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
+  
   if(in_matrix != out_matrix
      && matrix_exists(out_matrix)
      && matrix_exists(in_matrix))
   {
     int status = true;
     delete_matrix(out_matrix);
+    
     *out_matrix = make_matrix(in_matrix->n_rows, in_matrix->n_columns);
     status = status && walk_on_matrix(transmit_params(in_matrix, out_matrix, UNUSED), copy_element);
     out_matrix->n_permutations = in_matrix->n_permutations;
+    
     return status;
   }
-  else{};
-
+  
   return false;
 }
 
 
 int delete_matrix(matrix *in_matrix){
+  
   if(matrix_exists(in_matrix)){
+    
     for(int i = 0; i < in_matrix->n_rows; i++){
+      
       if(in_matrix->array[i]){
+        
         free(in_matrix->array[i]);
         in_matrix->array[i] = NULL;
       }
     }
+    
     free(in_matrix->array);
     in_matrix->array = NULL;
     return true;
   }
-  else{};
-
+  
   return false;
 }
 
 
 int rows_swap(int i_row_1, int i_row_2, MODIFIED matrix *in_matrix){
+  
   if(indexes_are_right(i_row_1, i_row_2, in_matrix->n_rows)){
     double buf = 0;
     for(int i = 0; i < in_matrix->n_columns; i++){
@@ -233,17 +258,19 @@ int rows_swap(int i_row_1, int i_row_2, MODIFIED matrix *in_matrix){
     ++(in_matrix->n_permutations);
     return true;
   }
-  else{};
-
+  
   return false;
 }
 
 
 int columns_swap(int i_col_1, int i_col_2, MODIFIED matrix *in_matrix){
+  
   int status = true;
+  
   status = status && transpose(in_matrix, in_matrix);
   status = status && rows_swap(i_col_1, i_col_2, in_matrix);
   status = status && transpose(in_matrix, in_matrix);
+  
   return status;
 }
 
@@ -254,23 +281,27 @@ int triangle_form(IN const matrix *in_matrix, OUT matrix *out_matrix){
 
 
 int row_mult_on_const(double factor, int i_row, MODIFIED matrix *out_matrix){
+  
   if(indexes_are_right(i_row, UNUSED, out_matrix->n_rows) && matrix_exists(out_matrix)){
+    
     for(int i = 0; i < out_matrix->n_columns; i++){
       out_matrix->array[i_row][i] *= factor;
     }
     return true;
   }
-  else{};
 
   return false;
 }
 
 
 int column_mult_on_const(double factor, int i_column, MODIFIED matrix *out_matrix){
+  
   int status = true;
+  
   status = status && transpose(out_matrix, out_matrix);
   status = status && row_mult_on_const(factor, i_column, out_matrix);
   status = status && transpose(out_matrix, out_matrix);
+  
   return status;
 }
 
@@ -281,13 +312,14 @@ int rows_sub(
   int i_subtracting_row,
   MODIFIED matrix *out_matrix)
 {
-  if(indexes_are_right(i_subtracted_row, i_subtracting_row, out_matrix->n_rows) && matrix_exists(out_matrix)){
+  if(indexes_are_right(i_subtracted_row, i_subtracting_row, out_matrix->n_rows) 
+     && matrix_exists(out_matrix)){
+    
     for(int i = 0; i < out_matrix->n_columns; i++){
       out_matrix->array[i_subtracted_row][i] -= out_matrix->array[i_subtracting_row][i] * factor;
     }
     return true;
   }
-  else{};
 
   return false;
 }
@@ -300,9 +332,11 @@ int columns_sub(
   MODIFIED matrix *out_matrix)
 {
   int status = true;
+  
   status = status && transpose(out_matrix, out_matrix);
   status = status && rows_sub(factor, i_subtracted_column, i_subtracting_column, out_matrix);
   status = status && transpose(out_matrix, out_matrix);
+  
   return status;
 }
 
@@ -324,7 +358,6 @@ int copy_row_to_other_matrix(
     }
     return true;
   }
-  else{};
 
   return false;
 }
@@ -338,11 +371,15 @@ int copy_column_to_other_matrix(
 {
   int status = true;
   matrix tmp = make_matrix(0,0);
+  
   status = status && transpose(in_matrix, &tmp);
   status = status && transpose(out_matrix, out_matrix);
+  
   status = status && copy_row_to_other_matrix(i_source, i_receiver, &tmp, out_matrix);
+  
   status = status && transpose(out_matrix, out_matrix);
   status = status && delete_matrix(&tmp);
+  
   return status;
 }
 
@@ -363,10 +400,12 @@ int inverse_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
     
     double factor = 0;
     for(int i = tmp.n_rows-1; i > 0; i--){
+      
       factor = tmp.array[i][i];
       status = status && row_mult_on_const(1/factor, i, &tmp);
       status = status && row_mult_on_const(1/factor, i, &result);
-      for(int j = 0; j < i; j++){
+      
+      for(int j = 0; j < i; j++){        
         factor = tmp.array[j][i];
         status = status && rows_sub(factor, j, i, &tmp);
         status = status && rows_sub(factor, j, i, &result);
@@ -378,7 +417,6 @@ int inverse_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
     status = status && delete_matrix(&tmp);
     return status;
   }
-  else{};
 
   return false;
 }
@@ -407,6 +445,7 @@ int triangle_form_of_augmented_matrix(
   int status = true;
   matrix result = make_matrix(0,0);
   matrix result_2 = make_matrix(in_matrix->n_rows,in_matrix->n_columns);
+  
   status = status && copy_matrix(in_matrix, &result);
   status = status && init_matrix_as_unit(&result_2);
 
@@ -427,10 +466,13 @@ int triangle_form_of_augmented_matrix(
 			
       if(result.array[i][i] != 0 && result.array[j][i] != 0){    
         tmp = result.array[j][i];
+        
         status = status && row_mult_on_const(result.array[i][i], j, &result);
         status = status && row_mult_on_const(result.array[i][i], j, &result_2);
+        
         status = status && rows_sub(tmp, j, i, &result);
         status = status && rows_sub(tmp, j, i, &result_2);
+        
         status = status && row_mult_on_const(1/result.array[i][i], j, &result);
         status = status && row_mult_on_const(1/result.array[i][i], j, &result_2);
       }
@@ -440,16 +482,26 @@ int triangle_form_of_augmented_matrix(
 
   status = status && copy_matrix(&result, out_matrix);
   status = status && copy_matrix(&result_2, half_an_inverted_matrix);
+  
   status = status && delete_matrix(&result);
   status = status && delete_matrix(&result_2);
+  
   return status;
 }
 
 
 int walk_on_matrix(iomatr matr, action foo){
+  
   if(matrix_exists(matr.in_matrix) || matrix_exists(matr.out_matrix)){
-    int n_rows = matrix_exists(matr.in_matrix) ? matr.in_matrix->n_rows : matr.out_matrix->n_rows;
-    int n_columns = matrix_exists(matr.in_matrix) ? matr.in_matrix->n_columns : matr.out_matrix->n_columns;
+    
+    int n_rows = matrix_exists(matr.in_matrix) 
+      ? matr.in_matrix->n_rows 
+      : matr.out_matrix->n_rows;
+    
+    int n_columns = matrix_exists(matr.in_matrix) 
+      ? matr.in_matrix->n_columns 
+      : matr.out_matrix->n_columns;
+    
     for(int i = 0; i < n_rows; i++){
       for(int j = 0; j < n_columns; j++){
         foo(i, j, matr);
@@ -457,15 +509,18 @@ int walk_on_matrix(iomatr matr, action foo){
     }
     return true;
   }
-  else{}
+
   return false;
 }
 
 
 void init_by_random(int i_row, int i_column, iomatr matr){
+  
   srand((int)time(NULL)+(rand()));
+  
   int down = ((int*)matr.param)[0];
   int up = ((int*)matr.param)[1];
+  
   matr.out_matrix->array[i_row][i_column] = ((rand() % (up - down + 1)) + down);
 }
 
