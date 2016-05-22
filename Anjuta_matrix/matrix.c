@@ -136,6 +136,7 @@ int transpose(IN const matrix *in_matrix, OUT matrix *out_matrix){
 int multiplex_matrices(IN const matrix *in_matrix_1, IN const matrix *in_matrix_2, OUT matrix *out_matrix){
   
   if(in_matrix_2->n_rows == in_matrix_1->n_columns){
+    
     matrix result = make_matrix(in_matrix_1->n_rows, in_matrix_2->n_columns);
 
     for(int i = 0; i < result.n_rows ; i++){
@@ -158,6 +159,7 @@ int multiplex_matrices(IN const matrix *in_matrix_1, IN const matrix *in_matrix_
 double determinant(IN const matrix *in_matrix){
   
   if(matrix_exists(in_matrix) && in_matrix->n_rows == in_matrix->n_columns){    
+    
     double result = 1.0;
     matrix triangle = make_matrix(0,0);
     triangle_form(in_matrix, &triangle);
@@ -249,12 +251,14 @@ int delete_matrix(matrix *in_matrix){
 int rows_swap(int i_row_1, int i_row_2, MODIFIED matrix *in_matrix){
   
   if(indexes_are_right(i_row_1, i_row_2, in_matrix->n_rows)){
+    
     double buf = 0;
     for(int i = 0; i < in_matrix->n_columns; i++){
       buf = in_matrix->array[i_row_1][i];
       in_matrix->array[i_row_1][i] = in_matrix->array[i_row_2][i];
       in_matrix->array[i_row_2][i] = buf;
     }
+    
     ++(in_matrix->n_permutations);
     return true;
   }
@@ -282,7 +286,9 @@ int triangle_form(IN const matrix *in_matrix, OUT matrix *out_matrix){
 
 int row_mult_on_const(double factor, int i_row, MODIFIED matrix *out_matrix){
   
-  if(indexes_are_right(i_row, UNUSED, out_matrix->n_rows) && matrix_exists(out_matrix)){
+  if(indexes_are_right(i_row, UNUSED, out_matrix->n_rows) 
+     && matrix_exists(out_matrix))
+  {
     
     for(int i = 0; i < out_matrix->n_columns; i++){
       out_matrix->array[i_row][i] *= factor;
@@ -313,7 +319,8 @@ int rows_sub(
   MODIFIED matrix *out_matrix)
 {
   if(indexes_are_right(i_subtracted_row, i_subtracting_row, out_matrix->n_rows) 
-     && matrix_exists(out_matrix)){
+     && matrix_exists(out_matrix))
+  {
     
     for(int i = 0; i < out_matrix->n_columns; i++){
       out_matrix->array[i_subtracted_row][i] -= out_matrix->array[i_subtracting_row][i] * factor;
@@ -347,12 +354,14 @@ int copy_row_to_other_matrix(
   IN const matrix *in_matrix,
   OUT matrix *out_matrix )
 {
+  
   if(matrix_exists(in_matrix) 
     && matrix_exists(out_matrix)
     && indexes_are_right(i_source, UNUSED, in_matrix->n_rows)
     && indexes_are_right(i_receiver, UNUSED, out_matrix->n_rows)
     && in_matrix->n_columns == out_matrix->n_columns)
   {
+    
     for(int i = 0; i < in_matrix->n_columns; i++){
       out_matrix->array[i_receiver][i] = in_matrix->array[i_source][i];
     }
