@@ -394,6 +394,7 @@ int copy_column_to_other_matrix(
 
 
 int inverse_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
+  
   if(matrix_exists(in_matrix)
      && in_matrix->n_columns == in_matrix->n_rows
      && determinant(in_matrix) != 0)
@@ -405,12 +406,13 @@ int inverse_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
     status = status && init_matrix_as_unit(&result);
     status = status && copy_matrix(in_matrix, &tmp);
 
+    /* Forward substitution*/
     status = status && triangle_form_of_augmented_matrix(&tmp, &tmp, &result);
-    
-    double factor = 0;
+
+    /* Back substitution*/
     for(int i = tmp.n_rows-1; i > 0; i--){
       
-      factor = tmp.array[i][i];
+      double factor = tmp.array[i][i];
       status = status && row_mult_on_const(1/factor, i, &tmp);
       status = status && row_mult_on_const(1/factor, i, &result);
       
@@ -458,9 +460,12 @@ int triangle_form_of_augmented_matrix(
   status = status && copy_matrix(in_matrix, &result);
   status = status && init_matrix_as_unit(&result_2);
 
-  double tmp = 0;
   for(int i = 0; i < result.n_columns; i++){
 
+    /* This loop swaps current row with other one from next rows if element on the 
+     * diagonal is zero. If all elements after diagonal have zeros too, determinant is zero 
+     * because rank of matrix is less than number of its rows or columns. 
+     */
     for(int k = i+1; k < result.n_rows; k++){
       if(result.array[i][i] != 0){
         break;
@@ -474,7 +479,8 @@ int triangle_form_of_augmented_matrix(
     for(int j = 1+i; j < result.n_rows; j++){
 			
       if(result.array[i][i] != 0 && result.array[j][i] != 0){    
-        tmp = result.array[j][i];
+        
+        double tmp = result.array[j][i];
         
         status = status && row_mult_on_const(result.array[i][i], j, &result);
         status = status && row_mult_on_const(result.array[i][i], j, &result_2);
