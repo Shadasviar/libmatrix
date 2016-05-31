@@ -55,13 +55,13 @@ iomatr transmit_params(IN const matrix*, OUT matrix*, void* );
  */
 int walk_on_matrix(iomatr, action);
 
-inline void show(int, int, iomatr);
-inline void init(int, int, iomatr);
-inline void init_by_random(int, int, iomatr);
-inline void init_as_unit(int, int, iomatr);
-inline void init_by_foo(int, int, iomatr);
-inline void copy_element(int, int, iomatr);
-inline void transpon(int, int, iomatr);
+void show(int, int, iomatr);
+void init(int, int, iomatr);
+void init_by_random(int, int, iomatr);
+void init_as_unit(int, int, iomatr);
+void init_by_foo(int, int, iomatr);
+void copy_element(int, int, iomatr);
+void transpon(int, int, iomatr);
 
 
 int matrix_exists(const matrix *p_matrix);

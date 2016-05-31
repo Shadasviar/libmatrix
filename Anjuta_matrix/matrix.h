@@ -40,12 +40,13 @@
 #define MODIFIED
 
 
-typedef struct{
+struct matrix{
   int n_rows;
   int n_columns;
   double **array;
   int n_permutations;
-}matrix;
+};
+typedef struct matrix matrix;
 
 
 typedef double(*init_user)(int, int);
