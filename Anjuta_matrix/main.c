@@ -32,6 +32,25 @@ int main(){
    	int a, b;
     a = b = 0;
 
+  matrix m1, m2, m3;
+  
+  m1 = make_matrix(5,2);
+  init_matrix_by_random(&m1, 1, 9);
+  show_matrix(&m1);
+  puts("");
+
+  m2 = make_matrix(5,8);
+  init_matrix_by_random(&m2, 1, 9);
+  show_matrix(&m2);
+   puts("");
+
+  m3 = make_matrix(0,0);
+  sub_matrices(&m1, &m2, &m3);
+  show_matrix(&m3);
+   puts("");
+  
+  
+
     puts("Enter size of matrix");
     scanf("%d%d", &a, &b);
 
@@ -87,5 +106,6 @@ int main(){
 		delete_matrix(&matr);
 		delete_matrix(&results);
 		delete_matrix(&res);
+    
     return 0;
 }

@@ -62,6 +62,8 @@ void init_as_unit(int, int, iomatr);
 void init_by_foo(int, int, iomatr);
 void copy_element(int, int, iomatr);
 void transpon(int, int, iomatr);
+void add(int, int, iomatr);
+void sub(int, int, iomatr);
 
 
 int matrix_exists(const matrix *p_matrix);
@@ -393,6 +395,48 @@ int copy_column_to_other_matrix(
 }
 
 
+int add_matrices(IN const matrix *in_matrix_1, IN const matrix *in_matrix_2, OUT matrix *out_matrix){
+ if(matrix_exists(in_matrix_1)
+     && matrix_exists(in_matrix_2)
+     && matrix_exists(out_matrix)
+     &&in_matrix_1->n_rows == in_matrix_2->n_rows
+     && in_matrix_1->n_columns == in_matrix_2->n_columns)
+  {
+    int status = true;   
+    status = status && delete_matrix(out_matrix);
+    *out_matrix= make_matrix(in_matrix_2->n_rows, in_matrix_1->n_columns);
+
+    /* This complicated call is for transmitting two const params without warnings*/
+    iomatr tmp = transmit_params(in_matrix_1, UNUSED, UNUSED);
+    status = status && walk_on_matrix(transmit_params(in_matrix_1, out_matrix, &tmp), add);
+    return status;
+  }
+  
+  return false;
+}
+
+
+int sub_matrices(IN const matrix *in_matrix_1, IN const matrix *in_matrix_2, OUT matrix *out_matrix){
+  if(matrix_exists(in_matrix_1)
+     && matrix_exists(in_matrix_2)
+     && matrix_exists(out_matrix)
+     &&in_matrix_1->n_rows == in_matrix_2->n_rows
+     && in_matrix_1->n_columns == in_matrix_2->n_columns)
+  {
+    int status = true;   
+    status = status && delete_matrix(out_matrix);
+    *out_matrix= make_matrix(in_matrix_1->n_rows, in_matrix_1->n_columns);
+
+    /* This complicated call is for transmitting two const params without warnings*/
+    iomatr tmp = transmit_params(in_matrix_2, UNUSED, UNUSED);
+    status = status && walk_on_matrix(transmit_params(in_matrix_1, out_matrix, &tmp), sub);
+    return status;
+  }
+  
+  return false;
+}
+
+
 int inverse_matrix(IN const matrix *in_matrix, OUT matrix *out_matrix){
   
   if(matrix_exists(in_matrix)
@@ -576,3 +620,16 @@ void transpon(int i_row, int i_column, iomatr matr){
 iomatr transmit_params(const matrix *in_matrix, matrix *out_matrix, void *param){
   return (iomatr) { in_matrix, out_matrix, param};
 }
+
+
+void add(int i_row, int i_column, iomatr matr){
+  matr.out_matrix->array[i_row][i_column] =
+    matr.in_matrix->array[i_row][i_column] + ((iomatr*)(matr.param))->in_matrix->array[i_row][i_column];
+}
+
+
+void sub(int i_row, int i_column, iomatr matr){
+  matr.out_matrix->array[i_row][i_column] =
+    matr.in_matrix->array[i_row][i_column] - ((iomatr*)(matr.param))->in_matrix->array[i_row][i_column];
+}
+

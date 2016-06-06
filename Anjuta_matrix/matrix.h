@@ -82,5 +82,8 @@ int columns_sub(double factor, int i_subtracted_column, int i_subtracting_column
 int copy_row_to_other_matrix(int i_source, int i_receiver, IN const matrix*, OUT matrix*);
 int copy_column_to_other_matrix(int i_source, int i_receiver, IN const matrix*, OUT matrix*);
 
+int add_matrices(IN const matrix*, IN const matrix*, OUT matrix*);
+int sub_matrices(IN const matrix*, IN const matrix*, OUT matrix*);
+
 int inverse_matrix(IN const matrix*, OUT matrix*);
 
