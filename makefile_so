@@ -1,8 +1,0 @@
-matrix.o: matrix.c
-	gcc -c -fPIC matrix.c -std=c11
-
-libmatrix.so: matrix.o
-	gcc -shared -o libmatrix.so matrix.o
-
-matrix: main.o libmatrix.so
-	gcc -o matrix main.o -L. -l:libmatrix.so -lm -std=c11 -Wextra
