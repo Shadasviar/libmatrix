@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/Shadasviar/libmatrix.svg?branch=master)](https://travis-ci.org/Shadasviar/libmatrix)
 # libmatrix
 Library for working with matrices of double numbers
 
